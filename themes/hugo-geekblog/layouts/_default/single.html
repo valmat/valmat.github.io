@@ -18,6 +18,14 @@
         </div>
       {{ end }}
 
+      {{ with .Params.categories }}
+        <p>Категории:
+        {{ range . }}
+          <a href="{{ "/categories/" | relLangURL }}{{ . | urlize }}">{{ . }}</a>
+        {{ end }}
+        </p>
+      {{ end }}
+
 
       <h1 class="gblog-post__title">{{ partial "utils/title" . }}</h1>
 

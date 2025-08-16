@@ -74,6 +74,40 @@
   </span>
 {{ end }}
 
+
+{{ $cc := 0 }}
+{{ with .Params.categories }}
+  {{ range sort . }}
+    {{ $name := . }}
+    {{ with $.Site.GetPage (printf "/categories/%s" $name | urlize) }}
+      {{ if eq $cc 0 }}
+        <span class="flex align-center no-wrap gblog-post__meta--category">
+          <svg class="gblog-icon gblog_folder"><use xlink:href="#gblog_folder"></use></svg>
+          {{ template "post-category" dict "name" $name "page" . }}
+        </span>
+      {{ else }}
+        <span class="flex align-center gblog-post__meta--category">
+          {{ template "post-category" dict "name" $name "page" . }}
+        </span>
+      {{ end }}
+    {{ end }}
+    {{ $cc = (add $cc 1) }}
+  {{ end }}
+{{ end }}
+
+{{ define "post-category" }}
+  <span class="gblog-post__tag gblog-button gblog-button--regular">
+    <a
+      class="gblog-button__link"
+      href="{{ .page.RelPermalink }}"
+      title="All posts in category '{{ .name }}'"
+    >
+      {{ .name }}
+    </a>
+  </span>
+{{ end }}
+
+
 {{ define "post-author" }}
   <span class="gblog-post__tag gblog-button gblog-button--regular">
     <a class="gblog-button__link" href="{{ .page.RelPermalink }}" title="All posts of this author">
