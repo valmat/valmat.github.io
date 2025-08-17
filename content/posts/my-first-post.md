@@ -43,6 +43,10 @@ Visit the [Hugo](https://gohugo.io) website!
 echo "Hello World"
 {{< /highlight >}}
 
+
+{{< gist valmat f5028dce9d76cc7c48a3 >}}
+
+
 # AI Onboarding Agent Design
 
 ## Оглавление
