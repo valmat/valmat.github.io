@@ -1,6 +1,7 @@
 baseURL = 'https://valmat.github.io/'
-languageCode = 'en-us'
-title = 'Valmat personal blog'
+#languageCode = 'en-us'
+languageCode = 'ru-ru'
+title = "Valmat's Personal Blog"
 theme = "hugo-geekblog"
 
 pluralizeListTitles = false
@@ -44,4 +45,16 @@ disablePathToLower = true
   section = ["HTML"]
   taxonomy = ["HTML"]
   term = ["HTML", "ATOM"]
+
+#[languages.en]
+#languageName = "English"
+#contentDir = "content/en"
+#weight = 20
+#
+#[languages.ru]
+#languageName = "Русский"
+#contentDir = "content/ru"
+#weight = 10
+#
+#defaultContentLanguage = "ru"
 

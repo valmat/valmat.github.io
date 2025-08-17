@@ -1,0 +1,53 @@
+---
+edit_page: Редактировать страницу
+
+nav_navigation: Навигация
+nav_tags: Теги
+nav_more: Еще
+nav_top: Наверх
+
+form_placeholder_search: Поиск
+
+error_page_title: Потерялись? Не волнуйтесь
+error_message_title: Потерялись?
+error_message_code: Ошибка 404
+error_message_text: >
+  Похоже, то, что вы ищете, не найдено. Не волнуйтесь, мы можем
+  вернуть вас на <a class="gdoc-error__link" href="{{ . }}">главную страницу</a>.
+
+button_toggle_dark: Переключить темную/светлую/авто тему
+button_nav_open: Открыть навигацию
+button_nav_close: Закрыть навигацию
+button_menu_open: Открыть меню
+button_menu_close: Закрыть меню
+button_homepage: На главную
+
+title_anchor_prefix: "Якорь для:"
+
+posts_read_more: Читать полностью
+posts_read_time:
+  one: "Одна минута на чтение"
+  other: "{{ . }} минут на чтение"
+posts_update_prefix: Обновлено
+posts_count:
+  one: "Одна запись"
+  other: "{{ . }} записей"
+posts_tagged_with: Все записи с тегом '{{ . }}'
+
+footer_build_with: >
+  Сделано с помощью <a href="https://gohugo.io/" class="gdoc-footer__link">Hugo</a> и
+  <svg class="gdoc-icon gdoc_heart"><use xlink:href="#gdoc_heart"></use></svg>
+footer_legal_notice: Правовая информация
+footer_privacy_policy: Политика конфиденциальности
+footer_content_license_prefix: >
+  Контент лицензирован по
+
+language_switch_no_tranlation_prefix: "Страница не переведена:"
+
+propertylist_required: обязательно
+propertylist_optional: необязательно
+propertylist_default: по умолчанию
+
+pagination_page_prev: назад
+pagination_page_next: вперед
+pagination_page_state: "{{ .PageNumber }}/{{ .TotalPages }}"

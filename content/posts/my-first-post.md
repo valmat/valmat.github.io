@@ -11,7 +11,7 @@ resources:
 ---
 
 
-{{< img name="images/1/test.jpg" lazy=false >}}
+{ {< img name="images/1/test.jpg" lazy=false >} }
 
 +++
 title = 'My First Post'
@@ -47,7 +47,7 @@ echo "Hello World"
 
 ## Оглавление
 
-{{< toc >}}
+{ {< toc >} }
 
 ## Введение
 
@@ -68,7 +68,8 @@ echo "Hello World"
 
 ### Общая схема взаимодействия
 
-```mermaid
+
+{{< mermaid class="text-center" >}}
 graph LR
     Пользователь  <--> Frontend
     Frontend      <--> Agent_Backend[Agent Backend]
@@ -77,7 +78,7 @@ graph LR
     Agent_Backend <---> AI_Agent[AI-Agent]
     AI_Agent      --> Tools
     AI_Agent      --> Actions
-```
+{{< /mermaid >}}
 
 **Компоненты:**
 - **Finom-Backend:** основной backend-сервис компании, хранящий все поля и реализующий API для всех клиентов. **Определяет бизнес-процесс и flow онбординга, включая последовательность шагов и логику переходов.**
