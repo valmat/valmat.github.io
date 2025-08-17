@@ -2,7 +2,8 @@
 title: "PHP Counter"
 date: 2010-10-28T06:02:00Z
 draft: false
-tags: ["archive", "php", "github"]
+tags: ["archive"]
+# tags: ["archive", "php", "github"]
 # filename: "php-counter"
 # catigories: ["php", "github"]
 ---

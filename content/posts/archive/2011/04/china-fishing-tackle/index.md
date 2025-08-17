@@ -2,7 +2,8 @@
 title: "Рыбацкие снасти из Китая"
 date: 2011-04-11T16:22:00Z
 draft: false
-tags: ["archive", "china", "рыбалка"]
+tags: ["archive"]
+# tags: ["archive", "china", "рыбалка"]
 # filename: "china-fishing-tackle"
 # catigories: ["china", "рыбалка"]
 ---

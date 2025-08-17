@@ -2,9 +2,10 @@
 title: "Разжился SSD диском"
 date: 2013-12-02T11:55:00+00:00
 draft: false
-tags: ["archive", "ssd"]
-filename: "ssd"
-catigories: []
+tags: ["archive"]
+# tags: ["archive", "ssd"]
+# filename: "ssd"
+# catigories: []
 ---
 
 Вот и я разжился SSD диском.

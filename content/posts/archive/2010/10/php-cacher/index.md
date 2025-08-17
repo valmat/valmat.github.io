@@ -2,7 +2,8 @@
 title: "php Cacher"
 date: 2010-10-30T10:48:00Z
 draft: false
-tags: ["archive", "php", "github"]
+tags: ["archive"]
+# tags: ["archive", "php", "github"]
 # filename: "php-cacher"
 # catigories: ["php", "github"]
 ---

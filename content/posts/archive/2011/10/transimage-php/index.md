@@ -2,7 +2,8 @@
 title: "Библиотека для загрузки фотографий на сайт"
 date: 2011-10-01T11:24:00+00:00
 draft: false
-tags: ["archive", "php", "github"]
+tags: ["archive"]
+# tags: ["archive", "php", "github"]
 # filename: "transimage-php"
 # catigories: ["php", "github"]
 ---

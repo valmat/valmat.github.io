@@ -3,8 +3,8 @@ title: "Clang vs gcc performance"
 date: 2014-05-31T21:18:00Z
 draft: false
 tags: ["archive"]
-filename: "clang-vs-gcc-performance"
-catigories: []
+# filename: "clang-vs-gcc-performance"
+# catigories: []
 ---
 
 Стало мне интересно, и решил я провести такую глупую проверку: сравнить производительность программ, откомпилированных Clang'ом и gcc.

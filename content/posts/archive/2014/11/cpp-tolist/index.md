@@ -23,7 +23,9 @@ a, b = ['str1', 'str2']
 
 Вот что у меня получилось:
 
-```cpp
+{{< gist valmat 455d9f9c56237b87f7e2 >}}
+
+<!-- ```cpp
 /**
  * This is a helper class.
  * It can be used only inside the function ListInitializer tolist(Args&& ...args)
@@ -162,7 +164,9 @@ int main()
  * |str1 str2 str3 str4 str5
  *
  */
-```
+``` -->
+
+См также [Optimized string concatenation: strjoin.cpp](https://gist.github.com/valmat/fdb37d1b741d5c12336d)
 
 Нужен C++11, т.к. используются Ref-qualifiers.
 

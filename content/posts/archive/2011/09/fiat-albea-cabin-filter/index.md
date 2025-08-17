@@ -3,8 +3,8 @@ title: "Замена салонного фильтра на Fiat Albea"
 date: 2011-09-02T17:23:00Z
 draft: false
 tags: ["archive"]
-filename: "fiat-albea-cabin-filter"
-catigories: ["fiat", "auto", "albea"]
+# filename: "fiat-albea-cabin-filter"
+# catigories: ["fiat", "auto", "albea"]
 ---
 
 Для замены салонного фильтра понадобятся:

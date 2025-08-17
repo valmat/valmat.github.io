@@ -2,7 +2,8 @@
 title: "Google Chrome и \"-\" 400 0 \"-\" \"-\""
 date: 2013-01-24T20:46:00Z
 draft: false
-tags: ["archive", "nginx", "400", "web", "Google Chrome"]
+tags: ["archive"]
+# tags: ["archive", "nginx", "400", "web", "Google Chrome"]
 # filename: "chrome-400-log"
 # catigories: ["nginx", "400", "web", "Google Chrome"]
 ---

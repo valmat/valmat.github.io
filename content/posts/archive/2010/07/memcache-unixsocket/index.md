@@ -3,8 +3,8 @@ title: "Запуск memcache через unix.socket"
 date: 2010-07-24T11:04:00+00:00
 draft: false
 tags: ["archive"]
-filename: "memcache-unixsocket"
-catigories: ["php", "memcache"]
+# filename: "memcache-unixsocket"
+# catigories: ["php", "memcache"]
 ---
 
 ## Запуск memcache через unix.socket

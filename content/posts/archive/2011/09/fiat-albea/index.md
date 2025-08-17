@@ -3,8 +3,8 @@ title: "Установка ветровиков на Fiat Albea"
 date: 2011-09-02T14:58:00Z
 draft: false
 tags: ["archive"]
-filename: "fiat-albea"
-catigories: ["fiat", "auto", "albea"]
+# filename: "fiat-albea"
+# catigories: ["fiat", "auto", "albea"]
 ---
 
 Наконец-то установил ветровики на свой Фиат.

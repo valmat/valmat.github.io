@@ -2,7 +2,8 @@
 title: "Установка LaTeX в Linux Ubuntu"
 date: 2010-09-08T14:30:00+00:00
 draft: false
-tags: ["archive", "LaTeX", "linux"]
+tags: ["archive"]
+# tags: ["archive", "LaTeX", "linux"]
 # filename: "latex-linux-ubuntu"
 # catigories: ["LaTeX", "linux"]
 ---

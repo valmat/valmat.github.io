@@ -2,9 +2,10 @@
 title: "Установка Redis via unix.socket"
 date: 2011-12-03T07:05:00+00:00
 draft: false
-tags: ["archive", "redis", "linux"]
-filename: "redis-via-unixsocket"
-catigories: ["redis", "linux"]
+tags: ["archive"]
+# tags: ["archive", "redis", "linux"]
+# filename: "redis-via-unixsocket"
+# catigories: ["redis", "linux"]
 ---
 
 ## О том, как установить Redis в качестве сервера на Linux и обращаться к нему через Unix.socket

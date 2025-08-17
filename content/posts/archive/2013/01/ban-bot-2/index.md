@@ -2,7 +2,8 @@
 title: "Баним ботов. Часть 2"
 date: 2013-01-23T14:21:00Z
 draft: false
-tags: ["archive", "nginx", "400", "web", "Google Chrome"]
+tags: ["archive"]
+# tags: ["archive", "nginx", "400", "web", "Google Chrome"]
 # filename: "ban-bot-2"
 # catigories: ["nginx", "400", "web", "Google Chrome"]
 ---

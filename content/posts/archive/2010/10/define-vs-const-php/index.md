@@ -2,7 +2,8 @@
 title: "define vs const в PHP"
 date: 2010-10-28T19:00:00Z
 draft: false
-tags: ["archive", "php", "benchmark"]
+tags: ["archive"]
+# tags: ["archive", "php", "benchmark"]
 # filename: "define-vs-const-php"
 # catigories: ["php", "benchmark"]
 ---

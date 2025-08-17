@@ -2,9 +2,10 @@
 title: "Сравнение производительности C++ php-расширения с нативным кодом"
 date: 2014-01-12T15:11:00+00:00
 draft: false
-tags: ["archive", "php", "c++", "web", "benchmark"]
-filename: "php-cpp-pagination"
-catigories: ["php", "c++", "web", "benchmark"]
+tags: ["archive"]
+# tags: ["archive", "php", "c++", "web", "benchmark"]
+# filename: "php-cpp-pagination"
+# catigories: ["php", "c++", "web", "benchmark"]
 ---
 
 Давно меня интересовал вопрос: насколько увеличивается производительность при переписывании нативного кода в php-расширение.

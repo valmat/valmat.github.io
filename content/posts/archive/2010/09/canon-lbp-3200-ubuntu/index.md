@@ -2,7 +2,8 @@
 title: "Принтер Canon LBP 3200 в Ubuntu"
 date: 2010-09-20T16:10:00Z
 draft: false
-tags: ["archive", "ubuntu", "lbp3200", "hardware", "linux", "printer"]
+tags: ["archive"]
+# tags: ["archive", "ubuntu", "lbp3200", "hardware", "linux", "printer"]
 # filename: "canon-lbp-3200-ubuntu"
 # catigories: ["ubuntu", "lbp3200", "hardware", "linux", "printer"]
 ---

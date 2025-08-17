@@ -3,8 +3,8 @@ title: "tmpfs: Операции с файловой системой в вирт
 date: 2010-07-24T11:08:00Z
 draft: false
 tags: ["archive"]
-filename: "tmpfs"
-catigories: []
+# filename: "tmpfs"
+# catigories: []
 ---
 
 # tmpfs: Операции с файловой системой в виртуальной памяти
