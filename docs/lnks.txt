@@ -18,4 +18,19 @@ https://geekdocs.de/shortcodes/hints/
 Где ещё хостить Hugo
 https://gohugo.io/host-and-deploy/
 
+----
+
+https://developers.google.com/blogger/?hl=ru&authuser
+https://gohugo.io/getting-started/quick-start/
+
+https://hugo-geekblog.geekdocs.de/tags/documentation/page/3/
+https://hugo-geekblog.geekdocs.de/tags/usage/
+https://github.com/thegeeklab/hugo-geekdoc/tree/main
+https://hugo-geekblog.geekdocs.de/posts/asciidoc/admonitions/#_example
+https://hugo-geekblog.geekdocs.de/posts/post-with-images/
+https://hugo-geekblog.geekdocs.de/posts/advanced/includes/
+https://hugo-geekblog.geekdocs.de/posts/features/authors/
+
+https://support.google.com/blogger/answer/41387?hl=ru
+
 
