@@ -80,7 +80,8 @@ make -j
 ```http
 POST /vecdb/create
 Content-Type: application/json
-
+```
+```json
 {
     "db_name": "my_vectors",
     "dim": 128,
@@ -97,7 +98,8 @@ Content-Type: application/json
 ```http
 POST /vectors/set
 Content-Type: application/json
-
+```
+```json
 {
     "db_name": "my_vectors",
     "data": [
@@ -115,7 +117,8 @@ Content-Type: application/json
 ```http
 POST /vectors/get/nearest
 Content-Type: application/json
-
+```
+```json
 {
     "db_name": "my_vectors",
     "vector": [0.1, 0.2, ...],
@@ -139,7 +142,8 @@ Content-Type: application/json
 ```http
 POST /vectors/delete
 Content-Type: application/json
-
+```
+```json
 {
     "db_name": "my_vectors",
     "data": [
@@ -162,7 +166,8 @@ Content-Type: application/json
 
 ## Заключение
 
-**LittleVec** — это ваш инструмент, если вам нужна минималистичная, быстрая, экономная и надёжная векторная база данных для pet-проектов, экспериментов, прототипов или даже небольших production-сервисов.  
+**LittleVec** —  минималистичная, быстрая, экономная и надёжная векторная база данных для экспериментов, прототипов или даже небольших production-сервисов.
+
 Всё открыто, просто и прозрачно — пробуйте, присылайте фидбек и pull requests!
 
 - [GitHub: LittleVec](https://github.com/valmat/little-vec)

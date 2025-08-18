@@ -108,14 +108,10 @@ $$
 
 Определим:
 
-$$
-\begin{aligned}
-x_{from} &= \frac{d}{2} - \frac{h |\sin(\phi)| + w |\cos(\phi)|}{2},\\
-x_{to}   &= d - x_{from},\\
-y_{from} &= \frac{d}{2} - \frac{h |\cos(\phi)| + w |\sin(\phi)|}{2},\\
-y_{to}   &= d - y_{from}
-\end{aligned}
-$$
+- $x_{from} = \frac{d}{2} - \frac{h |\sin(\phi)| + w |\cos(\phi)|}{2}$,
+- $x_{to}   = d - x_{from}$,
+- $y_{from} = \frac{d}{2} - \frac{h |\cos(\phi)| + w |\sin(\phi)|}{2}$,
+- $y_{to}   = d - y_{from}$
 
 где $x_{from}$ и $x_{to}$ — границы по ширине, $y_{from}$ и $y_{to}$ — по высоте.
 
@@ -158,4 +154,4 @@ $$
 - [WikiPedia: Энтропия Реньи (ru)](https://ru.wikipedia.org/wiki/Энтропия_Реньи)
 - [Исходный код алгоритма на GitHub (C++)](https://github.com/valmat/rotate_detection)
 - [Исходный код бенчмарка производительности энтропий на C++](https://gist.github.com/valmat/6a737cc3783449c4f7a829e77c77393e)
-
+- [Бенчмарк производительности энтропий](/posts/2022/02/entropy-benchmark/)
