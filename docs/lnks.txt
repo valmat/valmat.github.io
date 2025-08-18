@@ -33,4 +33,5 @@ https://hugo-geekblog.geekdocs.de/posts/features/authors/
 
 https://support.google.com/blogger/answer/41387?hl=ru
 
+https://katex.org/docs/supported
 
