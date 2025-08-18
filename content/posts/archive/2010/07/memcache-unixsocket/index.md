@@ -45,4 +45,4 @@ ini_set('session.save_handler', 'memcache');
 ini_set('session.save_path', $session_save_path);
 ```
 
-Но для сессий лучше всего всё-таки использовать [tmpfs](http://ufabiz.blogspot.com/2010/07/tmpfs.html).
+Но для сессий лучше всего всё-таки использовать [tmpfs](/posts/archive/2010/07/tmpfs/).

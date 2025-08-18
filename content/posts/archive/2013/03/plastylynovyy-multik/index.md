@@ -35,6 +35,6 @@ convert mygif.gif mymov.mov
 
 Видео на YouTube:
 
-[Смотреть на YouTube](https://www.youtube.com/watch?v=_oHiKSMMwAA)
-
 <iframe width="320" height="266" src="https://www.youtube.com/embed/_oHiKSMMwAA" title="Пластелиновый человечик" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+[Смотреть на YouTube](https://www.youtube.com/watch?v=_oHiKSMMwAA)

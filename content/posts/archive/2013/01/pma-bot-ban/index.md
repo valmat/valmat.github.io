@@ -39,25 +39,29 @@ tags: ["archive"]
 
 Для чего был создан fail2ban-скрипт `phpmyadmin.conf` следующего содержания:
 
-> # Fail2Ban configuration file  
-> #  
-> # Author: Valmat  
-> #
-> [Definition]
-> failregex = ^<host> - - \[.*\] "GET /(phpmyadmin|PMA|pma|admin|dbadmin|sql|mysql|myadmin|phpmyadmin2|phpMyAdmin2|phpMyAdmin-2|php-my-admin|sqlmanager|mysqlmanager|p/m/a|php-myadmin|phpmy-admin|webadmin|sqlweb|websql|webdb|mysqladmin|mysql-admin)/ HTTP/1.1" 404
->
-> ignoreregex =
+```bash
+ # Fail2Ban configuration file  
+ #  
+ # Author: Valmat  
+ #
+ [Definition]
+ failregex = ^<host> - - \[.*\] "GET /(phpmyadmin|PMA|pma|admin|dbadmin|sql|mysql|myadmin|phpmyadmin2|phpMyAdmin2|phpMyAdmin-2|php-my-admin|sqlmanager|mysqlmanager|p/m/a|php-myadmin|phpmy-admin|webadmin|sqlweb|websql|webdb|mysqladmin|mysql-admin)/ HTTP/1.1" 404
+
+ ignoreregex =
+```
 
 В `/etc/fail2ban/jail.conf` нужно добавить секцию:
 
-> [phpmyadmin]
->
-> enabled = true  
-> port    = http,https  
-> filter  = phpmyadmin  
-> logpath = /var/log/nginx/localhost.access.log  
-> bantime = 86400  
-> maxretry = 1
+```bash
+[phpmyadmin]
+
+enabled = true  
+port    = http,https  
+filter  = phpmyadmin  
+logpath = /var/log/nginx/localhost.access.log  
+bantime = 86400  
+maxretry = 1
+```
 
 За основу для построения скрипта был взят список:
 

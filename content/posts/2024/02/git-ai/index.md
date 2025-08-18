@@ -1,5 +1,5 @@
 ---
-title: "Git Ai"
+title: "AI git commit generator"
 date: 2024-02-07T12:00:00+03:00
 draft: false
 tags: ["AI", "LLM"]

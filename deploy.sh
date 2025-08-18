@@ -3,7 +3,8 @@
 set -e
 
 rm -rf public/
-hugo --minify
+# hugo --minify
+hugo
 cd public
 git init
 git add .
