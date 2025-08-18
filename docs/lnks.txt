@@ -30,8 +30,17 @@ https://hugo-geekblog.geekdocs.de/posts/asciidoc/admonitions/#_example
 https://hugo-geekblog.geekdocs.de/posts/post-with-images/
 https://hugo-geekblog.geekdocs.de/posts/advanced/includes/
 https://hugo-geekblog.geekdocs.de/posts/features/authors/
+https://geekdocs.de/
+https://github.com/thegeeklab/hugo-geekdoc
+https://hugo-geekblog.geekdocs.de/posts/usage/getting-started/
+https://github.com/thegeeklab/hugo-geekblog
+
+https://docs.github.com/ru/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site
 
 https://support.google.com/blogger/answer/41387?hl=ru
 
 https://katex.org/docs/supported
+
+http://localhost:1313/
+
 
