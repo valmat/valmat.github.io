@@ -1,0 +1,654 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <generator uri="https://gohugo.io/" version="0.92.2">Hugo</generator>
+    <title>Llm on Valmat&#39;s Personal Blog</title>
+            <link href="https://valmat.ru/tags/LLM/" rel="alternate" type="text/html" title="HTML" />
+            <link href="https://valmat.ru/tags/LLM/feed.xml" rel="self" type="application/atom+xml" title="Atom" />
+    <updated>2025-08-22T03:06:26+03:00</updated>
+    <id>https://valmat.ru/tags/LLM/</id>
+        <entry>
+            <title>LittleVec — легковесная векторная база данных</title>
+            <link href="https://valmat.ru/posts/2024/06/little-vec/" rel="alternate" type="text/html"  hreflang="en" />
+            <id>https://valmat.ru/posts/2024/06/little-vec/</id>
+            <published>2025-06-24T12:00:00+03:00</published>
+            <updated>2025-06-24T12:00:00+03:00</updated>
+            <content type="html">
+                &lt;p&gt;В последние годы векторные базы данных стали неотъемлемой частью современных ИИ-проектов: поиск по embedding, RAG-пайплайны, быстрый семантический поиск и многое другое. Однако, если вы когда-либо пробовали развернуть подобную БД — будь то FAISS, Milvus, Qdrant или аналогичные решения — вы наверняка сталкивались с тем, что даже для небольших экспериментов и pet-проектов такие системы требуют довольно мощного железа. В итоге приходится либо платить за дорогой сервер, либо мириться с низкой скоростью и неудобствами.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;мотивация-и-цели&#34;
+    &gt;
+        Мотивация и цели
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#мотивация-и-цели&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Мотивация и цели&#34; href=&#34;#%d0%bc%d0%be%d1%82%d0%b8%d0%b2%d0%b0%d1%86%d0%b8%d1%8f-%d0%b8-%d1%86%d0%b5%d0%bb%d0%b8&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Я регулярно разрабатываю прототипы и экспериментирую с RAG-пайплайнами, поэтому мне остро не хватало простой, быстрой и лёгкой векторной БД, которую можно было бы запустить на любом VPS или даже на домашнем мини-компьютере.&lt;br&gt;
+Мои цели были такие:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Минимальные требования к ресурсам.&lt;/strong&gt; Максимум эффективности: чтобы можно было держать миллионы векторов даже на слабых серверах.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Простота запуска и интеграции.&lt;/strong&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Надёжность хранения.&lt;/strong&gt; Не хочется терять данные из-за сбоя — значит, нужна проверенная СУБД в основе.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Гибкость.&lt;/strong&gt; Возможность использовать разные метрики расстояния, хранить дополнительную информацию (payload), работать с несколькими базами одновременно.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Так и родился &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/little-vec&#34;
+&gt;LittleVec&lt;/a&gt; — минималистичная векторная база данных, работающая как плагин для &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/RocksServer&#34;
+&gt;RocksServer&lt;/a&gt; и использующая в качестве хранилища сверхнадёжную &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://rocksdb.org/&#34;
+&gt;RocksDB&lt;/a&gt;.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;почему-это-может-быть-полезно-вам&#34;
+    &gt;
+        Почему это может быть полезно вам?
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#почему-это-может-быть-полезно-вам&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Почему это может быть полезно вам?&#34; href=&#34;#%d0%bf%d0%be%d1%87%d0%b5%d0%bc%d1%83-%d1%8d%d1%82%d0%be-%d0%bc%d0%be%d0%b6%d0%b5%d1%82-%d0%b1%d1%8b%d1%82%d1%8c-%d0%bf%d0%be%d0%bb%d0%b5%d0%b7%d0%bd%d0%be-%d0%b2%d0%b0%d0%bc&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Экономия ресурсов.&lt;/strong&gt; LittleVec потребляет всего 15–50 Мб ОЗУ даже на миллионах записей. Это значит, что вы можете запускать полноценную векторную БД даже на бюджетных VPS или в контейнере на локальной машине.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Быстрая интеграция.&lt;/strong&gt; Минималистичный и понятный API, готовые Docker-образы, поддержка DEB-пакетов — всё, чтобы вы могли быстро начать использовать LittleVec в своём проекте.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Надёжность и скорость.&lt;/strong&gt; Благодаря RocksDB и оптимизациям на уровне хранения, поиск по миллиону векторов занимает ~60 мс на обычном сервере.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;как-использовать-littlevec&#34;
+    &gt;
+        Как использовать LittleVec
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#как-использовать-littlevec&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Как использовать LittleVec&#34; href=&#34;#%d0%ba%d0%b0%d0%ba-%d0%b8%d1%81%d0%bf%d0%be%d0%bb%d1%8c%d0%b7%d0%be%d0%b2%d0%b0%d1%82%d1%8c-littlevec&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;1-установка-и-запуск&#34;
+    &gt;
+        1. Установка и запуск
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#1-установка-и-запуск&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor 1. Установка и запуск&#34; href=&#34;#1-%d1%83%d1%81%d1%82%d0%b0%d0%bd%d0%be%d0%b2%d0%ba%d0%b0-%d0%b8-%d0%b7%d0%b0%d0%bf%d1%83%d1%81%d0%ba&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;вариант-1-docker&#34;
+    &gt;
+        Вариант 1: Docker
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#вариант-1-docker&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Вариант 1: Docker&#34; href=&#34;#%d0%b2%d0%b0%d1%80%d0%b8%d0%b0%d0%bd%d1%82-1-docker&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Самый простой способ — воспользоваться Docker-образом:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;docker pull valmatdocker/littlevec
+docker run -d -p 5577:5577 --name littlevec valmatdocker/littlevec
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;После запуска API будет доступно на &lt;code&gt;127.0.0.1:5577&lt;/code&gt;.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;вариант-2-установка-через-deb-пакет&#34;
+    &gt;
+        Вариант 2: Установка через DEB-пакет
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#вариант-2-установка-через-deb-пакет&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Вариант 2: Установка через DEB-пакет&#34; href=&#34;#%d0%b2%d0%b0%d1%80%d0%b8%d0%b0%d0%bd%d1%82-2-%d1%83%d1%81%d1%82%d0%b0%d0%bd%d0%be%d0%b2%d0%ba%d0%b0-%d1%87%d0%b5%d1%80%d0%b5%d0%b7-deb-%d0%bf%d0%b0%d0%ba%d0%b5%d1%82&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Если вы предпочитаете запускать сервис напрямую:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Установите &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/RocksServer/releases&#34;
+&gt;RocksServer&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Клонируйте репозиторий LittleVec и соберите DEB-пакет:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;git clone https://github.com/valmat/little-vec.git
+&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; little-vec/build_deb
+./build.sh
+sudo dpkg -i littlevec_&amp;lt;version&amp;gt;_amd64.deb
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;Перезапустите RocksServer:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;sudo /etc/init.d/rocksserver restart
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;вариант-3-сборка-вручную&#34;
+    &gt;
+        Вариант 3: Сборка вручную
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#вариант-3-сборка-вручную&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Вариант 3: Сборка вручную&#34; href=&#34;#%d0%b2%d0%b0%d1%80%d0%b8%d0%b0%d0%bd%d1%82-3-%d1%81%d0%b1%d0%be%d1%80%d0%ba%d0%b0-%d0%b2%d1%80%d1%83%d1%87%d0%bd%d1%83%d1%8e&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; src
+make -j
+&lt;span class=&#34;c1&#34;&gt;# Поместите little_vec.so в каталог плагинов RocksServer (обычно /usr/lib/rocksserver/plugins)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;2-быстрый-старт-с-api&#34;
+    &gt;
+        2. Быстрый старт с API
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#2-быстрый-старт-с-api&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor 2. Быстрый старт с API&#34; href=&#34;#2-%d0%b1%d1%8b%d1%81%d1%82%d1%80%d1%8b%d0%b9-%d1%81%d1%82%d0%b0%d1%80%d1%82-%d1%81-api&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;создание-базы-данных&#34;
+    &gt;
+        Создание базы данных
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#создание-базы-данных&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Создание базы данных&#34; href=&#34;#%d1%81%d0%be%d0%b7%d0%b4%d0%b0%d0%bd%d0%b8%d0%b5-%d0%b1%d0%b0%d0%b7%d1%8b-%d0%b4%d0%b0%d0%bd%d0%bd%d1%8b%d1%85&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-http&#34; data-lang=&#34;http&#34;&gt;&lt;span class=&#34;err&#34;&gt;POST /vecdb/create
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;Content-Type: application/json
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;nt&#34;&gt;&amp;#34;db_name&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;my_vectors&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+    &lt;span class=&#34;nt&#34;&gt;&amp;#34;dim&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;128&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+    &lt;span class=&#34;nt&#34;&gt;&amp;#34;dist&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;cos&amp;#34;&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;db_name&lt;/code&gt; — имя вашей БД (любая строка)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;dim&lt;/code&gt; — размерность векторов&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;dist&lt;/code&gt; — метрика: &lt;code&gt;cos&lt;/code&gt;, &lt;code&gt;qcos&lt;/code&gt;, &lt;code&gt;dot_prod&lt;/code&gt;, &lt;code&gt;l1&lt;/code&gt;, &lt;code&gt;l2&lt;/code&gt; (опционально)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;добавление-векторов&#34;
+    &gt;
+        Добавление векторов
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#добавление-векторов&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Добавление векторов&#34; href=&#34;#%d0%b4%d0%be%d0%b1%d0%b0%d0%b2%d0%bb%d0%b5%d0%bd%d0%b8%d0%b5-%d0%b2%d0%b5%d0%ba%d1%82%d0%be%d1%80%d0%be%d0%b2&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-http&#34; data-lang=&#34;http&#34;&gt;&lt;span class=&#34;err&#34;&gt;POST /vectors/set
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;Content-Type: application/json
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;nt&#34;&gt;&amp;#34;db_name&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;my_vectors&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+    &lt;span class=&#34;nt&#34;&gt;&amp;#34;data&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;
+        &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+            &lt;span class=&#34;nt&#34;&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;vec1&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+            &lt;span class=&#34;nt&#34;&gt;&amp;#34;vector&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mf&#34;&gt;0.1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;0.2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;err&#34;&gt;...&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;],&lt;/span&gt;
+            &lt;span class=&#34;nt&#34;&gt;&amp;#34;payload&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;&amp;#34;text&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;пример&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+        &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;поиск-ближайших-векторов&#34;
+    &gt;
+        Поиск ближайших векторов
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#поиск-ближайших-векторов&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Поиск ближайших векторов&#34; href=&#34;#%d0%bf%d0%be%d0%b8%d1%81%d0%ba-%d0%b1%d0%bb%d0%b8%d0%b6%d0%b0%d0%b9%d1%88%d0%b8%d1%85-%d0%b2%d0%b5%d0%ba%d1%82%d0%be%d1%80%d0%be%d0%b2&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-http&#34; data-lang=&#34;http&#34;&gt;&lt;span class=&#34;err&#34;&gt;POST /vectors/get/nearest
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;Content-Type: application/json
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;nt&#34;&gt;&amp;#34;db_name&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;my_vectors&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+    &lt;span class=&#34;nt&#34;&gt;&amp;#34;vector&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mf&#34;&gt;0.1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;0.2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;err&#34;&gt;...&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;],&lt;/span&gt;
+    &lt;span class=&#34;nt&#34;&gt;&amp;#34;top_k&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;5&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Ответ:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;nt&#34;&gt;&amp;#34;data&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;
+        &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;nt&#34;&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;vec1&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nt&#34;&gt;&amp;#34;distance&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;0.123&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nt&#34;&gt;&amp;#34;payload&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;&amp;#34;text&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;пример&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;
+        &lt;span class=&#34;err&#34;&gt;...&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;удаление-векторов&#34;
+    &gt;
+        Удаление векторов
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#удаление-векторов&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Удаление векторов&#34; href=&#34;#%d1%83%d0%b4%d0%b0%d0%bb%d0%b5%d0%bd%d0%b8%d0%b5-%d0%b2%d0%b5%d0%ba%d1%82%d0%be%d1%80%d0%be%d0%b2&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-http&#34; data-lang=&#34;http&#34;&gt;&lt;span class=&#34;err&#34;&gt;POST /vectors/delete
+&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;Content-Type: application/json
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+    &lt;span class=&#34;nt&#34;&gt;&amp;#34;db_name&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;my_vectors&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+    &lt;span class=&#34;nt&#34;&gt;&amp;#34;data&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;
+        &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;nt&#34;&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;vec1&amp;#34;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+    &lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
+&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;3-дополнительные-возможности&#34;
+    &gt;
+        3. Дополнительные возможности
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#3-дополнительные-возможности&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor 3. Дополнительные возможности&#34; href=&#34;#3-%d0%b4%d0%be%d0%bf%d0%be%d0%bb%d0%bd%d0%b8%d1%82%d0%b5%d0%bb%d1%8c%d0%bd%d1%8b%d0%b5-%d0%b2%d0%be%d0%b7%d0%bc%d0%be%d0%b6%d0%bd%d0%be%d1%81%d1%82%d0%b8&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;Можно создавать несколько независимых векторных баз.&lt;/li&gt;
+&lt;li&gt;В каждом запросе указывать свою метрику поиска.&lt;/li&gt;
+&lt;li&gt;Хранить произвольный payload для каждого объекта.&lt;/li&gt;
+&lt;li&gt;Получать distance между любыми векторами и объектами по id.&lt;/li&gt;
+&lt;li&gt;Всё это — по простому HTTP API, легко интегрируется с любым языком.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;заключение&#34;
+    &gt;
+        Заключение
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#заключение&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Заключение&#34; href=&#34;#%d0%b7%d0%b0%d0%ba%d0%bb%d1%8e%d1%87%d0%b5%d0%bd%d0%b8%d0%b5&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;LittleVec&lt;/strong&gt; —  минималистичная, быстрая, экономная и надёжная векторная база данных для экспериментов, прототипов или даже небольших production-сервисов.&lt;/p&gt;
+&lt;p&gt;Всё открыто, просто и прозрачно — пробуйте, присылайте фидбек и pull requests!&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/little-vec&#34;
+&gt;GitHub: LittleVec&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/little-vec#readme&#34;
+&gt;Документация и примеры&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;p&gt;Все вопросы в issue на GitHub!&lt;/p&gt;
+
+            </content>    
+                                <category scheme="https://valmat.ru/tags/cpp" term="cpp" label="cpp" /> 
+                                <category scheme="https://valmat.ru/tags/LLM" term="LLM" label="LLM" />
+        </entry>
+        <entry>
+            <title>AI git commit generator</title>
+            <link href="https://valmat.ru/posts/2024/02/git-ai/" rel="alternate" type="text/html"  hreflang="en" />
+            <id>https://valmat.ru/posts/2024/02/git-ai/</id>
+            <published>2024-02-07T12:00:00+03:00</published>
+            <updated>2024-02-07T12:00:00+03:00</updated>
+            <content type="html">
+                &lt;p&gt;В создании коммитов, да и тегов, для гита самое сложное — придумать ёмкое описание, чтобы оно включало все важные аспекты изменений. А ещё это нужно сделать в правильном формате и на грамотном английском.&lt;/p&gt;
+&lt;p&gt;Поэтому в какой-то момент я просто взял и сделал bash-утилиты, использующие AI для этих вещей: &lt;strong&gt;gitai&lt;/strong&gt; для коммитов и &lt;strong&gt;gitaitag&lt;/strong&gt; для тегов. О них и расскажу ниже.&lt;/p&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;ai-для-коммитов-и-тегов-gitai-и-gitaitag&#34;
+    &gt;
+        AI для коммитов и тегов: &lt;code&gt;gitai&lt;/code&gt; и &lt;code&gt;gitaitag&lt;/code&gt;
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#ai-для-коммитов-и-тегов-gitai-и-gitaitag&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor AI для коммитов и тегов: gitai и gitaitag&#34; href=&#34;#ai-%d0%b4%d0%bb%d1%8f-%d0%ba%d0%be%d0%bc%d0%bc%d0%b8%d1%82%d0%be%d0%b2-%d0%b8-%d1%82%d0%b5%d0%b3%d0%be%d0%b2-gitai-%d0%b8-gitaitag&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;что-это-такое&#34;
+    &gt;
+        Что это такое?
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#что-это-такое&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Что это такое?&#34; href=&#34;#%d1%87%d1%82%d0%be-%d1%8d%d1%82%d0%be-%d1%82%d0%b0%d0%ba%d0%be%d0%b5&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://gist.github.com/valmat/44822e1b7c6884bebb25b3ff005117fe&#34;
+&gt;gitai&lt;/a&gt; — это bash-скрипт для Linux и macOS, который помогает создавать информативные git commit-сообщения с помощью OpenAI (или совместимых API). Скрипт не только пишет лаконичные заголовки в прошедшем времени и краткое описание изменений, но и добавляет эмодзи, список затронутых файлов и даже проводит AI-код-ревью с подсветкой потенциальных проблем или улучшений — всё на грамотном английском.&lt;/p&gt;
+&lt;p&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://gist.github.com/valmat/cd64141685f2655c4a02d59902962ca3&#34;
+&gt;gitaitag&lt;/a&gt; — похожий bash-скрипт для генерации содержательных сообщений к git-тегам и автоматического подбора следующей версии. Он анализирует все коммиты с прошлого тега, резюмирует изменения, добавляет релевантные эмодзи и оформляет красивое англоязычное описание релиза.&lt;/p&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;ключевые-возможности&#34;
+    &gt;
+        Ключевые возможности
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#ключевые-возможности&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Ключевые возможности&#34; href=&#34;#%d0%ba%d0%bb%d1%8e%d1%87%d0%b5%d0%b2%d1%8b%d0%b5-%d0%b2%d0%be%d0%b7%d0%bc%d0%be%d0%b6%d0%bd%d0%be%d1%81%d1%82%d0%b8&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;gitai&#34;
+    &gt;
+        &lt;code&gt;gitai&lt;/code&gt;:
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#gitai&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor gitai:&#34; href=&#34;#gitai&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;✨ Генерирует commit-сообщения через OpenAI или совместимый API (можно быстро переключиться на xAI и т.д.)&lt;/li&gt;
+&lt;li&gt;🐞 Проводит AI-код-ревью и вставляет комментарии о возможных багах или улучшениях прямо в коммит&lt;/li&gt;
+&lt;li&gt;📝 Автоматически резюмирует изменения (diff)&lt;/li&gt;
+&lt;li&gt;💬 Украсит сообщение релевантными эмодзи&lt;/li&gt;
+&lt;li&gt;📄 Перечисляет изменённые файлы&lt;/li&gt;
+&lt;li&gt;💡 Принимает подсказку (hint) для дополнительного контекста&lt;/li&gt;
+&lt;li&gt;🏷️ Всегда пишет на английском&lt;/li&gt;
+&lt;li&gt;🔒 Не даст закоммитить, если нет подготовленных изменений&lt;/li&gt;
+&lt;li&gt;🖊️ Даёт возможность отредактировать сообщение перед коммитом&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;gitaitag&#34;
+    &gt;
+        &lt;code&gt;gitaitag&lt;/code&gt;:
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#gitaitag&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor gitaitag:&#34; href=&#34;#gitaitag&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;🚀 Использует любой OpenAI-совместимый API для генерации описания тега&lt;/li&gt;
+&lt;li&gt;🏷️ Автоматически подбирает следующую версию тега (например, “v1.2.3” → “v1.2.4”)&lt;/li&gt;
+&lt;li&gt;✍️ Генерирует подробный changelog по всем коммитам с прошлого тега&lt;/li&gt;
+&lt;li&gt;🤖 Добавляет эмодзи и делает сообщение приятным для чтения&lt;/li&gt;
+&lt;li&gt;💡 Можно добавить свой hint для более точного описания релиза&lt;/li&gt;
+&lt;li&gt;🏷️ Всегда генерирует сообщение на английском&lt;/li&gt;
+&lt;li&gt;✏️ Позволяет вручную подправить текст перед созданием тега&lt;/li&gt;
+&lt;li&gt;🔒 Не создаёт тег, если нет новых коммитов с прошлого релиза&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;требования&#34;
+    &gt;
+        Требования
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#требования&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Требования&#34; href=&#34;#%d1%82%d1%80%d0%b5%d0%b1%d0%be%d0%b2%d0%b0%d0%bd%d0%b8%d1%8f&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Обе утилиты требуют:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;ОС:&lt;/strong&gt; Linux или macOS (Windows не поддерживается)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Зависимости:&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link--code&#34;
+  href=&#34;https://stedolan.github.io/jq/&#34;
+&gt;&lt;code&gt;jq&lt;/code&gt;&lt;/a&gt; (парсинг JSON)&lt;/li&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link--code&#34;
+  href=&#34;https://curl.se/&#34;
+&gt;&lt;code&gt;curl&lt;/code&gt;&lt;/a&gt; (обычно уже установлен)&lt;/li&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link--code&#34;
+  href=&#34;https://www.nano-editor.org/&#34;
+&gt;&lt;code&gt;nano&lt;/code&gt;&lt;/a&gt; (или замените на любимый редактор в скрипте)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;API-ключ OpenAI:&lt;/strong&gt; переменная окружения &lt;code&gt;$OPENAI_API_KEY&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;установка&#34;
+    &gt;
+        Установка
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#установка&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Установка&#34; href=&#34;#%d1%83%d1%81%d1%82%d0%b0%d0%bd%d0%be%d0%b2%d0%ba%d0%b0&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Установите зависимости:&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# Для Debian/Ubuntu и производных&lt;/span&gt;
+sudo apt-get install jq curl nano
+
+&lt;span class=&#34;c1&#34;&gt;# Для macOS (через Homebrew)&lt;/span&gt;
+brew install jq curl nano
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Скачайте скрипты:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;gitai:&lt;/strong&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;curl -o ~/bin/gitai https://gist.github.com/valmat/44822e1b7c6884bebb25b3ff005117fe/raw/gitai.sh
+chmod +x ~/bin/gitai
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;gitaitag:&lt;/strong&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;curl -o ~/bin/gitaitag https://gist.github.com/valmat/cd64141685f2655c4a02d59902962ca3/raw/gitaitag.sh
+chmod +x ~/bin/gitaitag
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Добавьте &lt;code&gt;~/bin&lt;/code&gt; в &lt;code&gt;$PATH&lt;/code&gt;:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Добавьте в &lt;code&gt;~/.bashrc&lt;/code&gt;, &lt;code&gt;~/.zshrc&lt;/code&gt; или аналогичный файл:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;&lt;span class=&#34;nb&#34;&gt;export&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;PATH&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;$HOME&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;/bin:&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;$PATH&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Перезапустите терминал или выполните &lt;code&gt;source ~/.bashrc&lt;/code&gt; (или соответствующий файл).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Установите переменную с OpenAI API-ключом:&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;&lt;span class=&#34;nb&#34;&gt;export&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;OPENAI_API_KEY&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;sk-...your key here...&amp;#34;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Для удобства добавьте эту строку в настройки вашей оболочки.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;использование&#34;
+    &gt;
+        Использование
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#использование&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Использование&#34; href=&#34;#%d0%b8%d1%81%d0%bf%d0%be%d0%bb%d1%8c%d0%b7%d0%be%d0%b2%d0%b0%d0%bd%d0%b8%d0%b5&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;для-коммитов--gitai&#34;
+    &gt;
+        Для коммитов — &lt;code&gt;gitai&lt;/code&gt;:
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#для-коммитов--gitai&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Для коммитов — gitai:&#34; href=&#34;#%d0%b4%d0%bb%d1%8f-%d0%ba%d0%be%d0%bc%d0%bc%d0%b8%d1%82%d0%be%d0%b2--gitai&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Перейдите в директорию git-проекта:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; /path/to/your/project
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Запустите скрипт:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;gitai
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Скрипт:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;автоматически выполнит &lt;code&gt;git add&lt;/code&gt; для всех изменений,&lt;/li&gt;
+&lt;li&gt;сгенерирует commit-сообщение с помощью AI,&lt;/li&gt;
+&lt;li&gt;откроет его в редакторе для финального редактирования,&lt;/li&gt;
+&lt;li&gt;закоммитит после сохранения.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;(Опционально) Можно добавить hint для AI:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;gitai &lt;span class=&#34;s2&#34;&gt;&amp;#34;Fix for production crash on startup&amp;#34;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;для-тегов--gitaitag&#34;
+    &gt;
+        Для тегов — &lt;code&gt;gitaitag&lt;/code&gt;:
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#для-тегов--gitaitag&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Для тегов — gitaitag:&#34; href=&#34;#%d0%b4%d0%bb%d1%8f-%d1%82%d0%b5%d0%b3%d0%be%d0%b2--gitaitag&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Перейдите в директорию git-проекта:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; /path/to/your/project
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Запустите скрипт:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;gitaitag
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Скрипт:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;найдет последний тег и предложит следующий (например, “v1.2.3” → “v1.2.4”),&lt;/li&gt;
+&lt;li&gt;проанализирует все коммиты после прошлого тега,&lt;/li&gt;
+&lt;li&gt;сгенерирует AI-описание релиза с эмодзи,&lt;/li&gt;
+&lt;li&gt;откроет его в редакторе для вашего финального взгляда,&lt;/li&gt;
+&lt;li&gt;создаст аннотированный тег с этим сообщением.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;(Опционально) Можно добавить hint для AI:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;gitaitag &lt;span class=&#34;s2&#34;&gt;&amp;#34;Major refactor and new API integration&amp;#34;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;примечания&#34;
+    &gt;
+        Примечания
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#примечания&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Примечания&#34; href=&#34;#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%87%d0%b0%d0%bd%d0%b8%d1%8f&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;Скрипты не поддерживают Windows.&lt;/li&gt;
+&lt;li&gt;Редактор по умолчанию — &lt;code&gt;nano&lt;/code&gt;, можно заменить в скрипте на любой другой.&lt;/li&gt;
+&lt;li&gt;Если нет изменений (для &lt;code&gt;gitai&lt;/code&gt;) или новых коммитов с прошлого тега (для &lt;code&gt;gitaitag&lt;/code&gt;), скрипты не будут ничего делать.&lt;/li&gt;
+&lt;li&gt;Каждый запрос к AI учитывается в биллинге вашего провайдера.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;примеры&#34;
+    &gt;
+        Примеры
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#примеры&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Примеры&#34; href=&#34;#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%80%d1%8b&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# Обычный коммит с помощью AI&lt;/span&gt;
+gitai
+
+&lt;span class=&#34;c1&#34;&gt;# Коммит с подсказкой для AI&lt;/span&gt;
+gitai &lt;span class=&#34;s2&#34;&gt;&amp;#34;Refactored backend integration&amp;#34;&lt;/span&gt;
+
+&lt;span class=&#34;c1&#34;&gt;# Обычное создание тега с описанием через AI&lt;/span&gt;
+gitaitag
+
+&lt;span class=&#34;c1&#34;&gt;# Тег с подсказкой для AI&lt;/span&gt;
+gitaitag &lt;span class=&#34;s2&#34;&gt;&amp;#34;Initial stable version for production&amp;#34;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;ссылки&#34;
+    &gt;
+        Ссылки
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#ссылки&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Ссылки&#34; href=&#34;#%d1%81%d1%81%d1%8b%d0%bb%d0%ba%d0%b8&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://gist.github.com/valmat/44822e1b7c6884bebb25b3ff005117fe&#34;
+&gt;gitai&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://gist.github.com/valmat/cd64141685f2655c4a02d59902962ca3&#34;
+&gt;gitaitag&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+            </content>    
+                                <category scheme="https://valmat.ru/tags/AI" term="AI" label="AI" /> 
+                                <category scheme="https://valmat.ru/tags/LLM" term="LLM" label="LLM" />
+        </entry>
+        <entry>
+            <title>Утилиты для извлечения изображений и текста из PDF</title>
+            <link href="https://valmat.ru/posts/2023/11/pdf-extract/" rel="alternate" type="text/html"  hreflang="en" />
+            <id>https://valmat.ru/posts/2023/11/pdf-extract/</id>
+            <published>2023-11-16T12:00:00+03:00</published>
+            <updated>2023-11-16T12:00:00+03:00</updated>
+            <content type="html">
+                &lt;p&gt;В повседневной работе часто возникает задача быстро извлечь изображения или текст из PDF-документов — будь то подготовка презентаций, анализ документов, создание датасетов или автоматизация обработки большого количества файлов. Стандартные графические редакторы или онлайн-сервисы либо требуют ручной работы, либо работают медленно, либо не позволяют автоматизировать процесс.&lt;/p&gt;
+&lt;p&gt;Чтобы упростить и ускорить решение этих задач, я написал набор утилит на C++ — &lt;strong&gt;PDF2Images&lt;/strong&gt;. Они позволяют:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Мгновенно извлекать все изображения из PDF-файлов в нужном формате (png, jpg, tiff и др.)&lt;/li&gt;
+&lt;li&gt;Получать текст с разбивкой по страницам или в один файл&lt;/li&gt;
+&lt;li&gt;Гибко настраивать параметры извлечения: диапазон страниц, формат выходных файлов, разрешение и пр.&lt;/li&gt;
+&lt;li&gt;Использовать утилиты в автоматических скриптах и пайплайнах&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Я сам ежедневно использую эти инструменты для подготовки скриншотов и текстовых выборок из PDF, а также для построения RAG (Retrieval-Augmented Generation) — когда нужно быстро получить текстовую базу для дальнейшей работы с LLM.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;установка&#34;
+    &gt;
+        Установка
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2023/11/pdf-extract/#установка&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Установка&#34; href=&#34;#%d1%83%d1%81%d1%82%d0%b0%d0%bd%d0%be%d0%b2%d0%ba%d0%b0&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Для работы потребуется установленная библиотека poppler:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;apt install libpoppler-dev
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Далее клонируем репозиторий:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;git clone --recursive https://github.com/valmat/pdf2images
+&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; pdf2images
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;или, если без &lt;code&gt;--recursive&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;git clone https://github.com/valmat/pdf2images
+&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; pdf2images
+git submodule update --init --recursive
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Переходим в папку &lt;code&gt;src&lt;/code&gt; и собираем проект:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; src
+make release
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Для debug-сборки можно использовать:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;make -j
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;извлечение-изображений&#34;
+    &gt;
+        Извлечение изображений
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2023/11/pdf-extract/#извлечение-изображений&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Извлечение изображений&#34; href=&#34;#%d0%b8%d0%b7%d0%b2%d0%bb%d0%b5%d1%87%d0%b5%d0%bd%d0%b8%d0%b5-%d0%b8%d0%b7%d0%be%d0%b1%d1%80%d0%b0%d0%b6%d0%b5%d0%bd%d0%b8%d0%b9&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;bin/extract_imgs.bin &amp;lt;input_file.pdf&amp;gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;options&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Основные опции:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;-i&lt;/code&gt;, &lt;code&gt;--input&lt;/code&gt; — путь к PDF-файлу&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-o&lt;/code&gt;, &lt;code&gt;--output&lt;/code&gt; — папка для сохранения изображений (по умолчанию &lt;code&gt;.&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-e&lt;/code&gt;, &lt;code&gt;--ext&lt;/code&gt; — формат изображений (по умолчанию &lt;code&gt;png&lt;/code&gt;, можно &lt;code&gt;jpg&lt;/code&gt;, &lt;code&gt;tiff&lt;/code&gt; и др.)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-f&lt;/code&gt;, &lt;code&gt;--from&lt;/code&gt; — первая страница для обработки (по умолчанию 1)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-l&lt;/code&gt;, &lt;code&gt;--lim&lt;/code&gt; — количество страниц для обработки (по умолчанию нет ограничений)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-x&lt;/code&gt;, &lt;code&gt;--xres&lt;/code&gt;, &lt;code&gt;-y&lt;/code&gt;, &lt;code&gt;--yres&lt;/code&gt;, &lt;code&gt;-d&lt;/code&gt;, &lt;code&gt;--dpi&lt;/code&gt; — разрешение и dpi&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-g&lt;/code&gt;, &lt;code&gt;--gray&lt;/code&gt; — черно-белый режим&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-q&lt;/code&gt;, &lt;code&gt;--quiet&lt;/code&gt; — тихий режим (без вывода прогресса)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Пример:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;bin/extract_imgs.bin -i mydoc.pdf -o imgs -e jpg -f &lt;span class=&#34;m&#34;&gt;2&lt;/span&gt; -l &lt;span class=&#34;m&#34;&gt;5&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Извлечет изображения со 2 по 6 страницу в папку &lt;code&gt;imgs&lt;/code&gt; в формате jpg.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;извлечение-текста&#34;
+    &gt;
+        Извлечение текста
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2023/11/pdf-extract/#извлечение-текста&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Извлечение текста&#34; href=&#34;#%d0%b8%d0%b7%d0%b2%d0%bb%d0%b5%d1%87%d0%b5%d0%bd%d0%b8%d0%b5-%d1%82%d0%b5%d0%ba%d1%81%d1%82%d0%b0&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;bin/extract_txts.bin -i &amp;lt;input_file.pdf&amp;gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;options&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Основные опции:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;-i&lt;/code&gt;, &lt;code&gt;--input&lt;/code&gt; — входной PDF (обязательно)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-o&lt;/code&gt;, &lt;code&gt;--out-dir&lt;/code&gt; — папка для сохранения текстов (по умолчанию &lt;code&gt;./&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-O&lt;/code&gt;, &lt;code&gt;--out-file&lt;/code&gt; — имя выходного файла (если указано, все страницы будут в одном файле)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-f&lt;/code&gt;, &lt;code&gt;--from&lt;/code&gt; — первая страница для извлечения (по умолчанию 1)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-l&lt;/code&gt;, &lt;code&gt;--limit&lt;/code&gt; — сколько страниц извлекать (по умолчанию без ограничения)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-n&lt;/code&gt;, &lt;code&gt;--nopagebreak&lt;/code&gt; — не добавлять разделитель между страницами (актуально при сохранении в один файл)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Пример:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;bin/extract_txts.bin -i mydoc.pdf -O all_text.txt -f &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; -l &lt;span class=&#34;m&#34;&gt;10&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Извлечет текст с 1 по 10 страницу в файл &lt;code&gt;all_text.txt&lt;/code&gt;.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;Утилиты распространяются под лицензией MIT, исходники доступны на &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/pdf2images&#34;
+&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
+
+            </content>    
+                                <category scheme="https://valmat.ru/tags/useful" term="useful" label="useful" /> 
+                                <category scheme="https://valmat.ru/tags/LLM" term="LLM" label="LLM" /> 
+                                <category scheme="https://valmat.ru/tags/cpp" term="cpp" label="cpp" />
+        </entry>
+</feed>
