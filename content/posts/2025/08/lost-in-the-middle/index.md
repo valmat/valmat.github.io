@@ -1,7 +1,7 @@
 ---
 title: "Lost in the Middle. Перевод знаменитой статьи"
 date: 2025-08-30T22:38:23+03:00
-draft: true
+draft: false
 tags: ["LLM"]
 ---
 
@@ -88,7 +88,24 @@ Nelson F. Liu\*, Kevin Lin, John Hewitt, Ashwin Paranjape, Michele Bevilacqua, F
 В задаче многодокументного вопросно-ответного анализа входные данные модели включают (i)~вопрос, на который нужно ответить, и (ii)~$k$ документов (например, отрывки из Википедии), где *ровно один* из документов содержит ответ на вопрос, а $k - 1$ «отвлекающих» документов не содержат.  
 Эта задача требует от модели доступа к документу, содержащему ответ, в пределах её входного контекста и использования его для ответа на вопрос.
 
-![Пример задачи многодокументного вопросно-ответного анализа](figures/qa_example.png)
+<!-- ![Пример задачи многодокументного вопросно-ответного анализа](figures/qa_example.png) -->
+#### Пример задачи многодокументного вопросно-ответного анализа
+
+**Input Context**
+>    Write a high-quality answer for the given question using only the provided search results (some of which might be irrelevant).
+>
+>    Document [1](Title: Asian Americans in science and technology) Prize in physics for discovery of the subatomic particle J/ψ. Subrahmanyan Chandrasekhar shared...
+>
+>    **Document [2](Title: List of Nobel laureates in Physics) The first Nobel Prize in Physics was awarded in 1901 to Wilhelm Conrad Röntgen, of Germany, who received...**
+>
+>    Document [3](Title: Scientist) and pursued through a unique method, was essentially in place. Ramón y Cajal won the Nobel Prize in 1906 for his remarkable...
+>
+>    Question: who got the first nobel prize in physics \
+>    Answer:
+
+**Desired Answer**
+> Wilhelm Conrad Röntgen
+
 *Документ, содержащий ответ, выделен для ясности.*
 
 Мы реализуем эту задачу с данными из NaturalQuestions-Open [Lee et al., 2019; Kwiatkowski et al., 2019], которые содержат исторические запросы, отправленные в поисковую систему Google, в сочетании с аннотированными людьми ответами, извлеченными из Википедии.  
@@ -101,11 +118,46 @@ Nelson F. Liu\*, Kevin Lin, John Hewitt, Ashwin Paranjape, Michele Bevilacqua, F
 
 Чтобы модулировать положение релевантной информации в пределах входного контекста, мы изменяем порядок документов, чтобы изменить положение документа, содержащего ответ.
 
-![Модуляция положения релевантной информации](figures/qa_changing_position.png)
+<!-- ![Модуляция положения релевантной информации](figures/qa_changing_position.png) -->
+#### Модуляция положения релевантной информации
+
+**Input Context**
+> Write a high-quality answer for the given question using only the provided search results (some of which might be irrelevant).
+> 
+> **Document [1](Title: List of Nobel laureates in Physics) ...** \
+> Document [2](Title: Asian Americans in science and technology) ... \
+> Document [3](Title: Scientist) ... 
+> 
+> Question: who got the first nobel prize in physics \
+> Answer:
+
+
+**Desired Answer**
+> Wilhelm Conrad Röntgen
+
+
 
 Чтобы модулировать длину входного контекста в этой задаче, мы увеличиваем или уменьшаем количество извлеченных документов, не содержащих ответа.
 
-![Модуляция длины входного контекста](figures/qa_changing_length.png)
+
+<!-- ![Модуляция длины входного контекста](figures/qa_changing_length.png) -->
+#### Модуляция длины входного контекста
+
+**Input Context**
+> Write a high-quality answer for the given question using only the provided search results (some of which might be irrelevant).
+> 
+> Document [1](Title: Asian Americans in science and technology) ... \
+> **Document [2](Title: List of Nobel laureates in Physics) ...** \
+> Document [3](Title: Scientist) ... \
+> Document [4](Title: Norwegian Americans) ... \
+> Document [5](Title: Maria Goeppert Mayer) ...
+> 
+> Question: who got the first nobel prize in physics \
+> Answer:
+
+**Desired Answer**
+> Wilhelm Conrad Röntgen
+
 
 Следуя [Kandpal et al., 2022; Mallen et al., 2023], мы используем точность в качестве нашего основного показателя оценки, оценивая, появляется ли какой-либо из правильных ответов (как взято из аннотаций NaturalQuestions) в предсказанном выводе.
 
@@ -160,7 +212,27 @@ Nelson F. Liu\*, Kevin Lin, John Hewitt, Ashwin Paranjape, Michele Bevilacqua, F
 Учитывая, что языковые модели испытывают трудности с извлечением и использованием информации из середины их входных контекстов в задаче многодокументного вопросно-ответного анализа, в какой степени они могут просто *извлекать* из входных контекстов?  
 Мы изучаем этот вопрос с помощью синтетической задачи извлечения ключевых значений.
 
-![Пример задачи извлечения ключевых значений](figures/kv_retrieval_example.png)
+<!-- ![Пример задачи извлечения ключевых значений](figures/kv_retrieval_example.png) -->
+
+**Input Context**
+> Extract the value corresponding to the specified key in the JSON object below.
+> 
+> JSON data:
+```json
+{"2a8d601d-1d69-4e64-9f90-8ad825a74195": "bb3ba2a5-7de8-434b-a86e-a88bb9fa7289",
+ "a54e2eed-e625-4570-9f74-3624e77d6684": "d1ff29be-4e2a-4208-a182-0cea716be3d4",
+ "9f4a92b9-5f69-4725-ba1e-403f08dea695": "703a7ce5-f17f-4e6d-b895-5836ba5ec71c", // <--
+ "52a9c80c-da51-4fc9-bf70-4a4901bc2ac3": "b2f8ea3d-4b1b-49e0-a141-b9823991ebeb",
+ "f4eb1c53-af0a-4dc4-a3a5-c2d50851a178": "d733b0d2-6af3-44e1-8592-e5637fdb76fb"}
+```
+> Key: "**9f4a92b9-5f69-4725-ba1e-403f08dea695**"
+> Corresponding value:
+
+**Desired Output**
+> 703a7ce5-f17f-4e6d-b895-5836ba5ec71c
+
+
+
 
 ### Экспериментальная установка
 
@@ -193,13 +265,13 @@ Nelson F. Liu\*, Kevin Lin, John Hewitt, Ashwin Paranjape, Michele Bevilacqua, F
 
 ### Влияние контекстуализации с учетом запроса
 
-![Контекстуализация с учетом запроса](figures/20_total_documents_precondition_with_question.png)
+![Контекстуализация с учетом запроса](figures/20_total_documents_precondition_with_question.jpg)
 
 - Размещение запроса перед *и* после данных почти не влияет на тенденции в многодокументном вопросно-ответном анализе, но помогает в синтетической задаче извлечения ключевых значений.
 
 ### Влияние тонкой настройки инструкций
 
-![Базовая модель vs. после тонкой настройки инструкций](figures/base_vs_instruction_tuned.png)
+![Базовая модель vs. после тонкой настройки инструкций](figures/base_vs_instruction_tuned.jpg)
 
 - U-образная кривая наблюдается как у базовой модели, так и у модели после тонкой настройки инструкций.
 - Тонкая настройка инструкций слегка уменьшает разницу между наилучшей и наихудшей производительностью.
@@ -211,7 +283,7 @@ Nelson F. Liu\*, Kevin Lin, John Hewitt, Ashwin Paranjape, Michele Bevilacqua, F
 - Предоставление языковой модели большего объема информации может помочь, но также увеличивает объем контента для анализа, что может снизить точность.
 - В экспериментах с NaturalQuestions-Open производительность модели насыщается задолго до насыщения извлечения: использование 50 документов вместо 20 улучшает точность лишь на 1–1.5%.
 
-![Извлечение и производительность модели в зависимости от количества документов](figures/odqa.png)
+![Извлечение и производительность модели в зависимости от количества документов](figures/odqa.jpg)
 
 ---
 
