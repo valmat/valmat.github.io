@@ -1,0 +1,1366 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <generator uri="https://gohugo.io/" version="0.152.1">Hugo</generator>
+    <title>Cpp on Valmat&#39;s Personal Blog</title>
+            <link href="https://valmat.ru/tags/cpp/" rel="alternate" type="text/html" title="html" />
+            <link href="https://valmat.ru/tags/cpp/feed.xml" rel="self" type="application/atom+xml" title="atom" />
+    <updated>2025-10-23T01:37:11+03:00</updated>
+    <id>https://valmat.ru/tags/cpp/</id>
+        <entry>
+            <title>LittleVec — легковесная векторная база данных</title>
+            <link href="https://valmat.ru/posts/2024/06/little-vec/" rel="alternate" type="text/html"  hreflang="en" />
+            <id>https://valmat.ru/posts/2024/06/little-vec/</id>
+            <published>2025-06-24T12:00:00+03:00</published>
+            <updated>2025-06-24T12:00:00+03:00</updated>
+            <content type="html">
+                &lt;p&gt;В последние годы векторные базы данных стали неотъемлемой частью современных ИИ-проектов: поиск по embedding, RAG-пайплайны, быстрый семантический поиск и многое другое. Однако, если вы когда-либо пробовали развернуть подобную БД — будь то FAISS, Milvus, Qdrant или аналогичные решения — вы наверняка сталкивались с тем, что даже для небольших экспериментов и pet-проектов такие системы требуют довольно мощного железа. В итоге приходится либо платить за дорогой сервер, либо мириться с низкой скоростью и неудобствами.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;мотивация-и-цели&#34;
+    &gt;
+        Мотивация и цели
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#мотивация-и-цели&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Мотивация и цели&#34; href=&#34;#%d0%bc%d0%be%d1%82%d0%b8%d0%b2%d0%b0%d1%86%d0%b8%d1%8f-%d0%b8-%d1%86%d0%b5%d0%bb%d0%b8&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Я регулярно разрабатываю прототипы и экспериментирую с RAG-пайплайнами, поэтому мне остро не хватало простой, быстрой и лёгкой векторной БД, которую можно было бы запустить на любом VPS или даже на домашнем мини-компьютере.&lt;br&gt;
+Мои цели были такие:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Минимальные требования к ресурсам.&lt;/strong&gt; Максимум эффективности: чтобы можно было держать миллионы векторов даже на слабых серверах.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Простота запуска и интеграции.&lt;/strong&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Надёжность хранения.&lt;/strong&gt; Не хочется терять данные из-за сбоя — значит, нужна проверенная СУБД в основе.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Гибкость.&lt;/strong&gt; Возможность использовать разные метрики расстояния, хранить дополнительную информацию (payload), работать с несколькими базами одновременно.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Так и родился &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/little-vec&#34;
+&gt;LittleVec&lt;/a&gt; — минималистичная векторная база данных, работающая как плагин для &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/RocksServer&#34;
+&gt;RocksServer&lt;/a&gt; и использующая в качестве хранилища сверхнадёжную &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://rocksdb.org/&#34;
+&gt;RocksDB&lt;/a&gt;.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;почему-это-может-быть-полезно-вам&#34;
+    &gt;
+        Почему это может быть полезно вам?
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#почему-это-может-быть-полезно-вам&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Почему это может быть полезно вам?&#34; href=&#34;#%d0%bf%d0%be%d1%87%d0%b5%d0%bc%d1%83-%d1%8d%d1%82%d0%be-%d0%bc%d0%be%d0%b6%d0%b5%d1%82-%d0%b1%d1%8b%d1%82%d1%8c-%d0%bf%d0%be%d0%bb%d0%b5%d0%b7%d0%bd%d0%be-%d0%b2%d0%b0%d0%bc&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Экономия ресурсов.&lt;/strong&gt; LittleVec потребляет всего 15–50 Мб ОЗУ даже на миллионах записей. Это значит, что вы можете запускать полноценную векторную БД даже на бюджетных VPS или в контейнере на локальной машине.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Быстрая интеграция.&lt;/strong&gt; Минималистичный и понятный API, готовые Docker-образы, поддержка DEB-пакетов — всё, чтобы вы могли быстро начать использовать LittleVec в своём проекте.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Надёжность и скорость.&lt;/strong&gt; Благодаря RocksDB и оптимизациям на уровне хранения, поиск по миллиону векторов занимает ~60 мс на обычном сервере.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;как-использовать-littlevec&#34;
+    &gt;
+        Как использовать LittleVec
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#как-использовать-littlevec&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Как использовать LittleVec&#34; href=&#34;#%d0%ba%d0%b0%d0%ba-%d0%b8%d1%81%d0%bf%d0%be%d0%bb%d1%8c%d0%b7%d0%be%d0%b2%d0%b0%d1%82%d1%8c-littlevec&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;1-установка-и-запуск&#34;
+    &gt;
+        1. Установка и запуск
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#1-установка-и-запуск&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor 1. Установка и запуск&#34; href=&#34;#1-%d1%83%d1%81%d1%82%d0%b0%d0%bd%d0%be%d0%b2%d0%ba%d0%b0-%d0%b8-%d0%b7%d0%b0%d0%bf%d1%83%d1%81%d0%ba&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;вариант-1-docker&#34;
+    &gt;
+        Вариант 1: Docker
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#вариант-1-docker&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Вариант 1: Docker&#34; href=&#34;#%d0%b2%d0%b0%d1%80%d0%b8%d0%b0%d0%bd%d1%82-1-docker&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Самый простой способ — воспользоваться Docker-образом:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker pull valmatdocker/littlevec
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker run -d -p 5577:5577 --name littlevec valmatdocker/littlevec
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;После запуска API будет доступно на &lt;code&gt;127.0.0.1:5577&lt;/code&gt;.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;вариант-2-установка-через-deb-пакет&#34;
+    &gt;
+        Вариант 2: Установка через DEB-пакет
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#вариант-2-установка-через-deb-пакет&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Вариант 2: Установка через DEB-пакет&#34; href=&#34;#%d0%b2%d0%b0%d1%80%d0%b8%d0%b0%d0%bd%d1%82-2-%d1%83%d1%81%d1%82%d0%b0%d0%bd%d0%be%d0%b2%d0%ba%d0%b0-%d1%87%d0%b5%d1%80%d0%b5%d0%b7-deb-%d0%bf%d0%b0%d0%ba%d0%b5%d1%82&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Если вы предпочитаете запускать сервис напрямую:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Установите &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/RocksServer/releases&#34;
+&gt;RocksServer&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Клонируйте репозиторий LittleVec и соберите DEB-пакет:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git clone https://github.com/valmat/little-vec.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; little-vec/build_deb
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;./build.sh
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo dpkg -i littlevec_&amp;lt;version&amp;gt;_amd64.deb
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;Перезапустите RocksServer:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo /etc/init.d/rocksserver restart
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;вариант-3-сборка-вручную&#34;
+    &gt;
+        Вариант 3: Сборка вручную
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#вариант-3-сборка-вручную&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Вариант 3: Сборка вручную&#34; href=&#34;#%d0%b2%d0%b0%d1%80%d0%b8%d0%b0%d0%bd%d1%82-3-%d1%81%d0%b1%d0%be%d1%80%d0%ba%d0%b0-%d0%b2%d1%80%d1%83%d1%87%d0%bd%d1%83%d1%8e&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; src
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;make -j
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# Поместите little_vec.so в каталог плагинов RocksServer (обычно /usr/lib/rocksserver/plugins)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;2-быстрый-старт-с-api&#34;
+    &gt;
+        2. Быстрый старт с API
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#2-быстрый-старт-с-api&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor 2. Быстрый старт с API&#34; href=&#34;#2-%d0%b1%d1%8b%d1%81%d1%82%d1%80%d1%8b%d0%b9-%d1%81%d1%82%d0%b0%d1%80%d1%82-%d1%81-api&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;создание-базы-данных&#34;
+    &gt;
+        Создание базы данных
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#создание-базы-данных&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Создание базы данных&#34; href=&#34;#%d1%81%d0%be%d0%b7%d0%b4%d0%b0%d0%bd%d0%b8%d0%b5-%d0%b1%d0%b0%d0%b7%d1%8b-%d0%b4%d0%b0%d0%bd%d0%bd%d1%8b%d1%85&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-http&#34; data-lang=&#34;http&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;POST /vecdb/create
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;Content-Type: application/json
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;db_name&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;my_vectors&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;dim&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;128&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;dist&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;cos&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;db_name&lt;/code&gt; — имя вашей БД (любая строка)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;dim&lt;/code&gt; — размерность векторов&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;dist&lt;/code&gt; — метрика: &lt;code&gt;cos&lt;/code&gt;, &lt;code&gt;qcos&lt;/code&gt;, &lt;code&gt;dot_prod&lt;/code&gt;, &lt;code&gt;l1&lt;/code&gt;, &lt;code&gt;l2&lt;/code&gt; (опционально)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;добавление-векторов&#34;
+    &gt;
+        Добавление векторов
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#добавление-векторов&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Добавление векторов&#34; href=&#34;#%d0%b4%d0%be%d0%b1%d0%b0%d0%b2%d0%bb%d0%b5%d0%bd%d0%b8%d0%b5-%d0%b2%d0%b5%d0%ba%d1%82%d0%be%d1%80%d0%be%d0%b2&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-http&#34; data-lang=&#34;http&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;POST /vectors/set
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;Content-Type: application/json
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;db_name&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;my_vectors&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;data&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;nt&#34;&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;vec1&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;nt&#34;&gt;&amp;#34;vector&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mf&#34;&gt;0.1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;0.2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;err&#34;&gt;...&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;],&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;nt&#34;&gt;&amp;#34;payload&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;&amp;#34;text&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;пример&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;поиск-ближайших-векторов&#34;
+    &gt;
+        Поиск ближайших векторов
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#поиск-ближайших-векторов&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Поиск ближайших векторов&#34; href=&#34;#%d0%bf%d0%be%d0%b8%d1%81%d0%ba-%d0%b1%d0%bb%d0%b8%d0%b6%d0%b0%d0%b9%d1%88%d0%b8%d1%85-%d0%b2%d0%b5%d0%ba%d1%82%d0%be%d1%80%d0%be%d0%b2&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-http&#34; data-lang=&#34;http&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;POST /vectors/get/nearest
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;Content-Type: application/json
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;db_name&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;my_vectors&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;vector&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mf&#34;&gt;0.1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;0.2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;err&#34;&gt;...&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;],&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;top_k&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;5&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Ответ:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;data&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;nt&#34;&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;vec1&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nt&#34;&gt;&amp;#34;distance&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;0.123&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nt&#34;&gt;&amp;#34;payload&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;&amp;#34;text&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;пример&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;err&#34;&gt;...&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;удаление-векторов&#34;
+    &gt;
+        Удаление векторов
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#удаление-векторов&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Удаление векторов&#34; href=&#34;#%d1%83%d0%b4%d0%b0%d0%bb%d0%b5%d0%bd%d0%b8%d0%b5-%d0%b2%d0%b5%d0%ba%d1%82%d0%be%d1%80%d0%be%d0%b2&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-http&#34; data-lang=&#34;http&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;POST /vectors/delete
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;Content-Type: application/json
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;db_name&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;my_vectors&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;data&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;nt&#34;&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;vec1&amp;#34;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;3-дополнительные-возможности&#34;
+    &gt;
+        3. Дополнительные возможности
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#3-дополнительные-возможности&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor 3. Дополнительные возможности&#34; href=&#34;#3-%d0%b4%d0%be%d0%bf%d0%be%d0%bb%d0%bd%d0%b8%d1%82%d0%b5%d0%bb%d1%8c%d0%bd%d1%8b%d0%b5-%d0%b2%d0%be%d0%b7%d0%bc%d0%be%d0%b6%d0%bd%d0%be%d1%81%d1%82%d0%b8&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;Можно создавать несколько независимых векторных баз.&lt;/li&gt;
+&lt;li&gt;В каждом запросе указывать свою метрику поиска.&lt;/li&gt;
+&lt;li&gt;Хранить произвольный payload для каждого объекта.&lt;/li&gt;
+&lt;li&gt;Получать distance между любыми векторами и объектами по id.&lt;/li&gt;
+&lt;li&gt;Всё это — по простому HTTP API, легко интегрируется с любым языком.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;заключение&#34;
+    &gt;
+        Заключение
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#заключение&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Заключение&#34; href=&#34;#%d0%b7%d0%b0%d0%ba%d0%bb%d1%8e%d1%87%d0%b5%d0%bd%d0%b8%d0%b5&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;LittleVec&lt;/strong&gt; —  минималистичная, быстрая, экономная и надёжная векторная база данных для экспериментов, прототипов или даже небольших production-сервисов.&lt;/p&gt;
+&lt;p&gt;Всё открыто, просто и прозрачно — пробуйте, присылайте фидбек и pull requests!&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/little-vec&#34;
+&gt;GitHub: LittleVec&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/little-vec#readme&#34;
+&gt;Документация и примеры&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;p&gt;Все вопросы в issue на GitHub!&lt;/p&gt;
+
+            </content>    
+                                <category scheme="https://valmat.ru/tags/cpp" term="cpp" label="cpp" /> 
+                                <category scheme="https://valmat.ru/tags/LLM" term="LLM" label="LLM" />
+        </entry>
+        <entry>
+            <title>Утилиты для извлечения изображений и текста из PDF</title>
+            <link href="https://valmat.ru/posts/2023/11/pdf-extract/" rel="alternate" type="text/html"  hreflang="en" />
+            <id>https://valmat.ru/posts/2023/11/pdf-extract/</id>
+            <published>2023-11-16T12:00:00+03:00</published>
+            <updated>2023-11-16T12:00:00+03:00</updated>
+            <content type="html">
+                &lt;p&gt;В повседневной работе часто возникает задача быстро извлечь изображения или текст из PDF-документов — будь то подготовка презентаций, анализ документов, создание датасетов или автоматизация обработки большого количества файлов. Стандартные графические редакторы или онлайн-сервисы либо требуют ручной работы, либо работают медленно, либо не позволяют автоматизировать процесс.&lt;/p&gt;
+&lt;p&gt;Чтобы упростить и ускорить решение этих задач, я написал набор утилит на C++ — &lt;strong&gt;PDF2Images&lt;/strong&gt;. Они позволяют:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Мгновенно извлекать все изображения из PDF-файлов в нужном формате (png, jpg, tiff и др.)&lt;/li&gt;
+&lt;li&gt;Получать текст с разбивкой по страницам или в один файл&lt;/li&gt;
+&lt;li&gt;Гибко настраивать параметры извлечения: диапазон страниц, формат выходных файлов, разрешение и пр.&lt;/li&gt;
+&lt;li&gt;Использовать утилиты в автоматических скриптах и пайплайнах&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Я сам ежедневно использую эти инструменты для подготовки скриншотов и текстовых выборок из PDF, а также для построения RAG (Retrieval-Augmented Generation) — когда нужно быстро получить текстовую базу для дальнейшей работы с LLM.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;установка&#34;
+    &gt;
+        Установка
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2023/11/pdf-extract/#установка&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Установка&#34; href=&#34;#%d1%83%d1%81%d1%82%d0%b0%d0%bd%d0%be%d0%b2%d0%ba%d0%b0&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Для работы потребуется установленная библиотека poppler:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;apt install libpoppler-dev
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Далее клонируем репозиторий:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git clone --recursive https://github.com/valmat/pdf2images
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; pdf2images
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;или, если без &lt;code&gt;--recursive&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git clone https://github.com/valmat/pdf2images
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; pdf2images
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git submodule update --init --recursive
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Переходим в папку &lt;code&gt;src&lt;/code&gt; и собираем проект:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; src
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;make release
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Для debug-сборки можно использовать:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;make -j
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;извлечение-изображений&#34;
+    &gt;
+        Извлечение изображений
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2023/11/pdf-extract/#извлечение-изображений&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Извлечение изображений&#34; href=&#34;#%d0%b8%d0%b7%d0%b2%d0%bb%d0%b5%d1%87%d0%b5%d0%bd%d0%b8%d0%b5-%d0%b8%d0%b7%d0%be%d0%b1%d1%80%d0%b0%d0%b6%d0%b5%d0%bd%d0%b8%d0%b9&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;bin/extract_imgs.bin &amp;lt;input_file.pdf&amp;gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;options&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Основные опции:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;-i&lt;/code&gt;, &lt;code&gt;--input&lt;/code&gt; — путь к PDF-файлу&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-o&lt;/code&gt;, &lt;code&gt;--output&lt;/code&gt; — папка для сохранения изображений (по умолчанию &lt;code&gt;.&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-e&lt;/code&gt;, &lt;code&gt;--ext&lt;/code&gt; — формат изображений (по умолчанию &lt;code&gt;png&lt;/code&gt;, можно &lt;code&gt;jpg&lt;/code&gt;, &lt;code&gt;tiff&lt;/code&gt; и др.)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-f&lt;/code&gt;, &lt;code&gt;--from&lt;/code&gt; — первая страница для обработки (по умолчанию 1)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-l&lt;/code&gt;, &lt;code&gt;--lim&lt;/code&gt; — количество страниц для обработки (по умолчанию нет ограничений)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-x&lt;/code&gt;, &lt;code&gt;--xres&lt;/code&gt;, &lt;code&gt;-y&lt;/code&gt;, &lt;code&gt;--yres&lt;/code&gt;, &lt;code&gt;-d&lt;/code&gt;, &lt;code&gt;--dpi&lt;/code&gt; — разрешение и dpi&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-g&lt;/code&gt;, &lt;code&gt;--gray&lt;/code&gt; — черно-белый режим&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-q&lt;/code&gt;, &lt;code&gt;--quiet&lt;/code&gt; — тихий режим (без вывода прогресса)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Пример:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;bin/extract_imgs.bin -i mydoc.pdf -o imgs -e jpg -f &lt;span class=&#34;m&#34;&gt;2&lt;/span&gt; -l &lt;span class=&#34;m&#34;&gt;5&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Извлечет изображения со 2 по 6 страницу в папку &lt;code&gt;imgs&lt;/code&gt; в формате jpg.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;извлечение-текста&#34;
+    &gt;
+        Извлечение текста
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2023/11/pdf-extract/#извлечение-текста&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Извлечение текста&#34; href=&#34;#%d0%b8%d0%b7%d0%b2%d0%bb%d0%b5%d1%87%d0%b5%d0%bd%d0%b8%d0%b5-%d1%82%d0%b5%d0%ba%d1%81%d1%82%d0%b0&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;bin/extract_txts.bin -i &amp;lt;input_file.pdf&amp;gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;options&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Основные опции:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;-i&lt;/code&gt;, &lt;code&gt;--input&lt;/code&gt; — входной PDF (обязательно)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-o&lt;/code&gt;, &lt;code&gt;--out-dir&lt;/code&gt; — папка для сохранения текстов (по умолчанию &lt;code&gt;./&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-O&lt;/code&gt;, &lt;code&gt;--out-file&lt;/code&gt; — имя выходного файла (если указано, все страницы будут в одном файле)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-f&lt;/code&gt;, &lt;code&gt;--from&lt;/code&gt; — первая страница для извлечения (по умолчанию 1)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-l&lt;/code&gt;, &lt;code&gt;--limit&lt;/code&gt; — сколько страниц извлекать (по умолчанию без ограничения)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-n&lt;/code&gt;, &lt;code&gt;--nopagebreak&lt;/code&gt; — не добавлять разделитель между страницами (актуально при сохранении в один файл)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Пример:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;bin/extract_txts.bin -i mydoc.pdf -O all_text.txt -f &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; -l &lt;span class=&#34;m&#34;&gt;10&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Извлечет текст с 1 по 10 страницу в файл &lt;code&gt;all_text.txt&lt;/code&gt;.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;Утилиты распространяются под лицензией MIT, исходники доступны на &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/pdf2images&#34;
+&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
+
+            </content>    
+                                <category scheme="https://valmat.ru/tags/useful" term="useful" label="useful" /> 
+                                <category scheme="https://valmat.ru/tags/LLM" term="LLM" label="LLM" /> 
+                                <category scheme="https://valmat.ru/tags/cpp" term="cpp" label="cpp" />
+        </entry>
+        <entry>
+            <title>Бенчмарк энтропий Шеннона и Реньи на C&#43;&#43;</title>
+            <link href="https://valmat.ru/posts/2022/02/entropy-benchmark/" rel="alternate" type="text/html"  hreflang="en" />
+            <id>https://valmat.ru/posts/2022/02/entropy-benchmark/</id>
+            <published>2022-02-08T12:00:00+03:00</published>
+            <updated>2022-02-08T12:00:00+03:00</updated>
+            <content type="html">
+                &lt;p&gt;Решил сравнить как различные показатели энтропии Реньи влияют на производительность в плане вычислений.&lt;/p&gt;
+&lt;p&gt;В реальных задачах часто возникает необходимость быстро и эффективно вычислять энтропию для большого количества данных.&lt;/p&gt;
+&lt;p&gt;Для этого важно понимать, как различные показатели энтропиивлияют на время выполнения.&lt;/p&gt;
+&lt;script src=&#34;https://gist.github.com/valmat/6a737cc3783449c4f7a829e77c77393e.js&#34;&gt;&lt;/script&gt;
+
+
+            </content>    
+                                <category scheme="https://valmat.ru/tags/cpp" term="cpp" label="cpp" />
+        </entry>
+        <entry>
+            <title>Определение угла наклона текста на сканированных изображениях</title>
+            <link href="https://valmat.ru/posts/2022/02/slope-detection/" rel="alternate" type="text/html"  hreflang="en" />
+            <id>https://valmat.ru/posts/2022/02/slope-detection/</id>
+            <published>2022-02-08T12:00:00+03:00</published>
+            <updated>2022-02-08T12:00:00+03:00</updated>
+            <content type="html">
+                &lt;p&gt;При оптическом распознавании текста на сканированных документах качество распознавания зависит от того, наклонён ли текст в документе. У выровненных документов качество распознавания заметно лучше. Соответственно, возникает практическая необходимость в средствах автоматического выравнивания угла наклона текста.&lt;/p&gt;
+&lt;p&gt;В статье предлагается простой, универсальный и достаточно эффективный алгоритм выравнивания наклона текста, основанный на идее минимизации средней энтропии строк и столбцов растрового изображения.&lt;/p&gt;
+&lt;hr&gt;
+
+
+
+  &lt;div class=&#34;gblog-toc gblog-toc__level--6&#34;&gt;
+    &lt;nav id=&#34;TableOfContents&#34;&gt;
+  &lt;ul&gt;
+    &lt;li&gt;
+      &lt;ul&gt;
+        &lt;li&gt;&lt;a href=&#34;#идея&#34;&gt;Идея&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#эксперимент&#34;&gt;Эксперимент&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#алгоритм&#34;&gt;Алгоритм&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href=&#34;#ссылки&#34;&gt;Ссылки&lt;/a&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/nav&gt;
+    &lt;hr /&gt;
+  &lt;/div&gt;
+
+
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;идея&#34;
+    &gt;
+        Идея
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2022/02/slope-detection/#идея&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Идея&#34; href=&#34;#%d0%b8%d0%b4%d0%b5%d1%8f&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Базовая идея алгоритма состоит в том, что при повороте текста на сканированном изображении средняя, по строкам и столбцам, энтропия распределения пикселей должна возрасти.&lt;/p&gt;
+&lt;p&gt;Предположим, нам дан чёрно-белый скан изображения. То есть, каждый пиксель может принимать только два значения: 0 или 1. Как известно, энтропия равномерного распределения максимальна. Если изображение повёрнуто, то в среднем, распределение чёрных и белых пикселей по строкам (и столбцам) будет ближе к равномерному, чем у неповёрнутого изображения. У выровненного изображения распределение пикселей в среднем должно быть менее равномерным.&lt;/p&gt;
+&lt;p&gt;&lt;img
+  src=&#34;img_1.png&#34;
+  alt=&#34;Пример изображения&#34;
+  
+/&gt;&lt;/p&gt;
+&lt;p&gt;Гипотеза состоит в том, чтобы вычислить среднюю по строкам и столбцам энтропию распределения пикселей для разных углов поворота и найти такой угол, при котором эта усреднённая энтропия примет минимальное значение.&lt;/p&gt;
+&lt;p&gt;Для проверки этой гипотезы в интернете был собран набор данных различных видов сканированных изображений, после чего предположения были проверены экспериментально.&lt;/p&gt;
+&lt;p&gt;Предложенный подход работает и позволяет абсолютно точно определить угол поворота в 83% случаев и с точностью до 1° — в 98% случаев.&lt;/p&gt;
+&lt;p&gt;Хотя, на первый взгляд, энтропия Шеннона хорошо подходит для этой задачи, было бы разумно не ограничиваться только ей, а рассмотреть весь спектр энтропий Реньи. И с учётом полученных результатов, а также вычислительной сложности, выбрать оптимальное значение параметра энтропии Реньи.&lt;/p&gt;
+&lt;p&gt;Энтропия Реньи вычисляется по формуле:&lt;/p&gt;
+&lt;p&gt;$$
+R_{\alpha} = \frac{1}{1-\alpha} \log\left( \sum_{i=1}^{n}p_i^{\alpha} \right),
+$$&lt;/p&gt;
+&lt;p&gt;где $p_i$ — вероятности, соответствующие распределению (в нашем случае — частоты чёрных и белых пикселей).&lt;/p&gt;
+&lt;p&gt;В случае $\alpha = 1$ это превращается в энтропию Шеннона:&lt;/p&gt;
+&lt;p&gt;$$
+R_{1} = H = - \sum_{i=1}^{n} p_i \log(p_i)
+$$&lt;/p&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;эксперимент&#34;
+    &gt;
+        Эксперимент
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2022/02/slope-detection/#эксперимент&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Эксперимент&#34; href=&#34;#%d1%8d%d0%ba%d1%81%d0%bf%d0%b5%d1%80%d0%b8%d0%bc%d0%b5%d0%bd%d1%82&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Для проведения эксперимента был собран набор различных документов в сети Интернет. Каждое изображение из набора было повёрнуто на случайный угол в интервале от -45° до 45°, после чего был вычислен угол поворота с помощью предложенного алгоритма.&lt;/p&gt;
+&lt;p&gt;&lt;img
+  src=&#34;img_2.png&#34;
+  alt=&#34;Пример повёрнутого изображения&#34;
+  
+/&gt;&lt;/p&gt;
+&lt;p&gt;В таблице ниже представлены результаты для различных значений параметра энтропии Реньи $\alpha$:&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;Параметр энтропии Реньи $\alpha$&lt;/th&gt;
+          &lt;th&gt;1/8&lt;/th&gt;
+          &lt;th&gt;1/4&lt;/th&gt;
+          &lt;th&gt;1/2&lt;/th&gt;
+          &lt;th&gt;3/4&lt;/th&gt;
+          &lt;th&gt;1&lt;/th&gt;
+          &lt;th&gt;2&lt;/th&gt;
+          &lt;th&gt;5&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Среднее абсолютное отклонение&lt;/td&gt;
+          &lt;td&gt;0.498&lt;/td&gt;
+          &lt;td&gt;0.299&lt;/td&gt;
+          &lt;td&gt;&lt;strong&gt;0.211&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;0.283&lt;/td&gt;
+          &lt;td&gt;0.240&lt;/td&gt;
+          &lt;td&gt;5.827&lt;/td&gt;
+          &lt;td&gt;41.099&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Доля полных совпадений (точность)&lt;/td&gt;
+          &lt;td&gt;0.822&lt;/td&gt;
+          &lt;td&gt;&lt;strong&gt;0.834&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;0.828&lt;/td&gt;
+          &lt;td&gt;0.815&lt;/td&gt;
+          &lt;td&gt;0.805&lt;/td&gt;
+          &lt;td&gt;0.641&lt;/td&gt;
+          &lt;td&gt;0.009&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Доля совпадений с точностью до 1°&lt;/td&gt;
+          &lt;td&gt;0.942&lt;/td&gt;
+          &lt;td&gt;0.969&lt;/td&gt;
+          &lt;td&gt;&lt;strong&gt;0.980&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;&lt;strong&gt;0.982&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;&lt;strong&gt;0.983&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;0.822&lt;/td&gt;
+          &lt;td&gt;0.015&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Доля совпадений с точностью до 2°&lt;/td&gt;
+          &lt;td&gt;0.967&lt;/td&gt;
+          &lt;td&gt;0.983&lt;/td&gt;
+          &lt;td&gt;&lt;strong&gt;0.991&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;&lt;strong&gt;0.993&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;&lt;strong&gt;0.994&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;0.841&lt;/td&gt;
+          &lt;td&gt;0.015&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Всего было обработано 1665 документов.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Выводы из таблицы:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Наименьшее среднее абсолютное отклонение достигается при $\alpha = \frac{1}{2}$.&lt;/li&gt;
+&lt;li&gt;Наилучшая точность (доля полных совпадений) — при $\alpha = \frac{1}{4}$.&lt;/li&gt;
+&lt;li&gt;Наилучшая приемлемая точность (доля совпадений с точностью до 1° и до 2°) — при $\alpha \in {1, \frac{3}{4}, \frac{1}{2}}$.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Если рассматривать методику как часть комплекса оптического распознавания документов, то наилучшим значением оказывается $\alpha = \frac{1}{2}$.&lt;/p&gt;
+&lt;p&gt;При $\alpha = \frac{1}{2}$ среднее абсолютное отклонение составит всего $0.211^\circ$. При этом достигается оптимальная доля совпадений с точностью до 1°.&lt;/p&gt;
+&lt;p&gt;Есть ещё одна причина выбрать $\alpha = \frac{1}{2}$: при этом значении достигается оптимальная вычислительная сложность.&lt;/p&gt;
+&lt;p&gt;Ниже представлены результаты бенчмарка многократного вычисления энтропий для различных значений параметра $\alpha$:&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;$\alpha$&lt;/th&gt;
+          &lt;th&gt;nanoseconds&lt;/th&gt;
+          &lt;th&gt;miliseconds&lt;/th&gt;
+          &lt;th&gt;% of Shannon&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;1&lt;/td&gt;
+          &lt;td&gt;10249895206&lt;/td&gt;
+          &lt;td&gt;10249&lt;/td&gt;
+          &lt;td&gt;100&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;1/2&lt;/td&gt;
+          &lt;td&gt;8677368472&lt;/td&gt;
+          &lt;td&gt;8677&lt;/td&gt;
+          &lt;td&gt;84.66&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;1/4&lt;/td&gt;
+          &lt;td&gt;10421639934&lt;/td&gt;
+          &lt;td&gt;10421&lt;/td&gt;
+          &lt;td&gt;120.1&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;1/8&lt;/td&gt;
+          &lt;td&gt;13235709810&lt;/td&gt;
+          &lt;td&gt;13235&lt;/td&gt;
+          &lt;td&gt;127&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;3/4&lt;/td&gt;
+          &lt;td&gt;11403406522&lt;/td&gt;
+          &lt;td&gt;11403&lt;/td&gt;
+          &lt;td&gt;86.16&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;2&lt;/td&gt;
+          &lt;td&gt;7245386547&lt;/td&gt;
+          &lt;td&gt;7245&lt;/td&gt;
+          &lt;td&gt;63.54&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;5&lt;/td&gt;
+          &lt;td&gt;7771674801&lt;/td&gt;
+          &lt;td&gt;7771&lt;/td&gt;
+          &lt;td&gt;107.26&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;10&lt;/td&gt;
+          &lt;td&gt;10809162384&lt;/td&gt;
+          &lt;td&gt;10809&lt;/td&gt;
+          &lt;td&gt;139.08&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Из таблицы видно, что среди подходящих значений $\alpha$ наилучшая производительность достигается при $\alpha = 1/2$.&lt;/p&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;алгоритм&#34;
+    &gt;
+        Алгоритм
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2022/02/slope-detection/#алгоритм&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Алгоритм&#34; href=&#34;#%d0%b0%d0%bb%d0%b3%d0%be%d1%80%d0%b8%d1%82%d0%bc&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Замечание:&lt;/strong&gt;&lt;br&gt;
+Предлагаемый ниже алгоритм (&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/rotate_detection&#34;
+&gt;исходный код на GitHub&lt;/a&gt;) предполагает, что для определения угла поворота мы используем бинарное чёрно-белое растровое изображение, в котором каждый пиксель может принимать два значения: 0 или 1.&lt;/p&gt;
+&lt;p&gt;Для применения алгоритма необходимо получить бинаризованную копию изображения.&lt;/p&gt;
+&lt;p&gt;Я реализовал алгоритм с применением библиотеки &lt;em&gt;libleptonica&lt;/em&gt; (используется в TesseractOCR). Для этого использовал последовательное преобразование &lt;code&gt;pixContrastTRC&lt;/code&gt; с &lt;code&gt;contrast_factor = 1.0&lt;/code&gt; и затем &lt;code&gt;pixConvertTo1&lt;/code&gt; с &lt;code&gt;threshold = 170&lt;/code&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Пусть $h$ — высота, $w$ — ширина исходного изображения. Пусть $d = \sqrt{w^2 + h^2}$ — длина диагонали.&lt;/p&gt;
+&lt;p&gt;Будем поворачивать изображение на угол $\phi$ относительно центра изображения и считать среднюю энтропию по строкам и столбцам. Чтобы не выйти за границы, мысленно расширим полотно до размеров $d \times d$.&lt;/p&gt;
+&lt;p&gt;Определим:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;$x_{from} = \frac{d}{2} - \frac{h |\sin(\phi)| + w |\cos(\phi)|}{2}$,&lt;/li&gt;
+&lt;li&gt;$x_{to}   = d - x_{from}$,&lt;/li&gt;
+&lt;li&gt;$y_{from} = \frac{d}{2} - \frac{h |\cos(\phi)| + w |\sin(\phi)|}{2}$,&lt;/li&gt;
+&lt;li&gt;$y_{to}   = d - y_{from}$&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;где $x_{from}$ и $x_{to}$ — границы по ширине, $y_{from}$ и $y_{to}$ — по высоте.&lt;/p&gt;
+&lt;p&gt;Нужно посчитать среднюю энтропию по строкам (и аналогично по столбцам).&lt;/p&gt;
+&lt;p&gt;Пусть $V(x, y)$ — цвет пикселя $(x, y)$ (0 или 1), $R({p, q})$ — энтропия распределения ${p, q}$.&lt;/p&gt;
+&lt;p&gt;Алгоритм расчёта средней энтропии $S_{\phi}$ для угла $\phi$ (по строкам):&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code class=&#34;language-pseudo&#34; data-lang=&#34;pseudo&#34;&gt;S_phi = 0
+for y in y_from .. y_to:
+    b = 0  // количество чёрных пикселей в строке
+    for x in x_from .. x_to:
+        x_tilde = x - d/2
+        y_tilde = y - d/2
+        x&amp;#39; = x_tilde * cos(phi) - y_tilde * sin(phi) + w/2
+        y&amp;#39; = x_tilde * sin(phi) + y_tilde * cos(phi) + h/2
+        if x&amp;#39; &amp;gt;= 0 and x&amp;#39; &amp;lt; w and y&amp;#39; &amp;gt;= 0 and y&amp;#39; &amp;lt; h:
+            b = b + V(x&amp;#39;, y&amp;#39;)
+    p = b / d
+    q = 1 - p
+    S_phi = S_phi + R({p, q}) / d
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Полученное значение $S_\phi$ — средняя энтропия для угла поворота $\phi$.&lt;/p&gt;
+&lt;p&gt;Для нахождения искомого угла поворота $\phi_0$ нужно найти минимум $S_\phi$:&lt;/p&gt;
+&lt;p&gt;$$
+\phi_0 = -\arg\min_\phi S_\phi
+$$&lt;/p&gt;
+&lt;p&gt;Знак минус берётся потому, что для выравнивания изображения нужно повернуть его в обратную сторону.&lt;/p&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;ссылки&#34;
+    &gt;
+        Ссылки
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2022/02/slope-detection/#ссылки&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Ссылки&#34; href=&#34;#%d1%81%d1%81%d1%8b%d0%bb%d0%ba%d0%b8&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://ru.wikipedia.org/wiki/%d0%ad%d0%bd%d1%82%d1%80%d0%be%d0%bf%d0%b8%d1%8f_%d0%a0%d0%b5%d0%bd%d1%8c%d0%b8&#34;
+&gt;WikiPedia: Энтропия Реньи (ru)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/rotate_detection&#34;
+&gt;Исходный код алгоритма на GitHub (C++)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://gist.github.com/valmat/6a737cc3783449c4f7a829e77c77393e&#34;
+&gt;Исходный код бенчмарка производительности энтропий на C++&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;/posts/2022/02/entropy-benchmark/&#34;
+&gt;Бенчмарк производительности энтропий&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+            </content>    
+                                <category scheme="https://valmat.ru/tags/cpp" term="cpp" label="cpp" /> 
+                                <category scheme="https://valmat.ru/tags/AI" term="AI" label="AI" /> 
+                                <category scheme="https://valmat.ru/tags/algo" term="algo" label="algo" />
+        </entry>
+        <entry>
+            <title>Получение целочисленного типа по его длине</title>
+            <link href="https://valmat.ru/posts/2021/09/cpp-int-by-size/" rel="alternate" type="text/html"  hreflang="en" />
+            <id>https://valmat.ru/posts/2021/09/cpp-int-by-size/</id>
+            <published>2019-09-12T12:00:00+03:00</published>
+            <updated>2019-09-12T12:00:00+03:00</updated>
+            <content type="html">
+                &lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h1 id=&#34;простой-способ-получить-целочисленный-тип-по-его-длине&#34;
+    &gt;
+        Простой способ получить целочисленный тип по его длине
+    &lt;/h1&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2021/09/cpp-int-by-size/#простой-способ-получить-целочисленный-тип-по-его-длине&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Простой способ получить целочисленный тип по его длине&#34; href=&#34;#%d0%bf%d1%80%d0%be%d1%81%d1%82%d0%be%d0%b9-%d1%81%d0%bf%d0%be%d1%81%d0%be%d0%b1-%d0%bf%d0%be%d0%bb%d1%83%d1%87%d0%b8%d1%82%d1%8c-%d1%86%d0%b5%d0%bb%d0%be%d1%87%d0%b8%d1%81%d0%bb%d0%b5%d0%bd%d0%bd%d1%8b%d0%b9-%d1%82%d0%b8%d0%bf-%d0%bf%d0%be-%d0%b5%d0%b3%d0%be-%d0%b4%d0%bb%d0%b8%d0%bd%d0%b5&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;script src=&#34;https://gist.github.com/valmat/9c3d3c14fa7695b35e56086be9140475.js&#34;&gt;&lt;/script&gt;
+
+
+            </content>    
+                                <category scheme="https://valmat.ru/tags/cpp" term="cpp" label="cpp" />
+        </entry>
+        <entry>
+            <title>Пробуем контрактное программирование С&#43;&#43;20 уже сейчас</title>
+            <link href="https://valmat.ru/posts/archive/2019/03/cpp-contracts/" rel="alternate" type="text/html"  hreflang="en" />
+            <id>https://valmat.ru/posts/archive/2019/03/cpp-contracts/</id>
+            <published>2019-03-14T12:00:00+03:00</published>
+            <updated>2019-03-14T12:00:00+03:00</updated>
+            <content type="html">
+                &lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h1 id=&#34;пробуем-контрактное-программирование-с20-уже-сейчас&#34;
+    &gt;
+        Пробуем контрактное программирование С++20 уже сейчас
+    &lt;/h1&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/archive/2019/03/cpp-contracts/#пробуем-контрактное-программирование-с20-уже-сейчас&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Пробуем контрактное программирование С&amp;#43;&amp;#43;20 уже сейчас&#34; href=&#34;#%d0%bf%d1%80%d0%be%d0%b1%d1%83%d0%b5%d0%bc-%d0%ba%d0%be%d0%bd%d1%82%d1%80%d0%b0%d0%ba%d1%82%d0%bd%d0%be%d0%b5-%d0%bf%d1%80%d0%be%d0%b3%d1%80%d0%b0%d0%bc%d0%bc%d0%b8%d1%80%d0%be%d0%b2%d0%b0%d0%bd%d0%b8%d0%b5-%d1%8120-%d1%83%d0%b6%d0%b5-%d1%81%d0%b5%d0%b9%d1%87%d0%b0%d1%81&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;img
+  src=&#34;pic.png&#34;
+  alt=&#34;&#34;
+  
+/&gt;&lt;/p&gt;
+&lt;p&gt;В С++20 появилось контрактное программирование. На текущий момент ни один компилятор ещё не реализовал поддержку этой возможности.&lt;/p&gt;
+&lt;p&gt;Но есть способ уже сейчас попробовать использовать контракты из C++20, так как это описано в стандарте.
+&lt;cut text=&#34;Заинтересовавшихся прошу под кат&#34; /&gt;&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;tldr&#34;
+    &gt;
+        TL;DR
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/archive/2019/03/cpp-contracts/#tldr&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor TL;DR&#34; href=&#34;#tldr&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;em&gt;Есть форк clang, поддерживающий контракты. На его примере я рассказываю как пользоваться контрактами, чтобы как только фича появилась в вашем любимом компиляторе, вы сразу же могли начать её использовать.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Про контрактное программирование уже написано много, но в двух словах расскажу что это такое и для чего нужно.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;логика-хоара&#34;
+    &gt;
+        Логика Хоара
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/archive/2019/03/cpp-contracts/#логика-хоара&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Логика Хоара&#34; href=&#34;#%d0%bb%d0%be%d0%b3%d0%b8%d0%ba%d0%b0-%d1%85%d0%be%d0%b0%d1%80%d0%b0&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;В основе парадигмы контрактов лежит логика Хоара (&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://ru.wikipedia.org/wiki/%D0%9B%D0%BE%D0%B3%D0%B8%D0%BA%D0%B0_%D0%A5%D0%BE%D0%B0%D1%80%D0%B0&#34;
+&gt;1&lt;/a&gt;, &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://habr.com/ru/post/268013/&#34;
+&gt;2&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;Логика Хоара – это способ формального доказательства корректности алгоритма.
+Она оперирует такими понятиями, как предусловие, постусловие и инвариант.
+С практической точки зрения, использование логики  Хоара это, во-первых, способ формального доказательства корректности программы в тех случаях, когда ошибки могут привести к катастрофе или гибели людей. Во-вторых, способ повысить надёжность программы, наряду со статическим анализом и тестированием.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;контрактное-программирование&#34;
+    &gt;
+        Контрактное программирование
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/archive/2019/03/cpp-contracts/#контрактное-программирование&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Контрактное программирование&#34; href=&#34;#%d0%ba%d0%be%d0%bd%d1%82%d1%80%d0%b0%d0%ba%d1%82%d0%bd%d0%be%d0%b5-%d0%bf%d1%80%d0%be%d0%b3%d1%80%d0%b0%d0%bc%d0%bc%d0%b8%d1%80%d0%be%d0%b2%d0%b0%d0%bd%d0%b8%d0%b5&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;(&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://ru.wikipedia.org/wiki/%D0%9A%D0%BE%D0%BD%D1%82%D1%80%D0%B0%D0%BA%D1%82%D0%BD%D0%BE%D0%B5_%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5&#34;
+&gt;1&lt;/a&gt;, &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://habr.com/ru/post/38612/&#34;
+&gt;2&lt;/a&gt;)&lt;/p&gt;
+&lt;p&gt;Основная идея контрактов в том, что по аналогии с контрактами в бизнесе, для каждой функции или метода описываются договорённости. Эти договорённости должны соблюдать как вызывающая сторона, так и вызываемая.
+Неотъемлемой частью контрактов является как минимум два режима сборки – отладочный и продуктовый. В зависимости от режима сборки контракты должны себя вести по разному. Наиболее распространённой практикой является проверка контрактов в отладочной сборке и их игнорирование в продуктовой.&lt;/p&gt;
+&lt;p&gt;Иногда в продуктовой сборке контракты тоже проверяются и их невыполнение может, например, вести к генерации исключения.&lt;/p&gt;
+&lt;p&gt;Основное отличие использования контрактов от «классического» подхода в том, что вызывающая сторона должна соблюдать предусловия вызываемой стороны, которые описываются в контракте, а вызываемая должна соблюдать свои постусловия и инварианты.
+Соответственно, вызываемая сторона не обязана проверять корректность передаваемых её параметров. Эта обязанность возлагается контрактом на вызывающую сторону.&lt;/p&gt;
+&lt;p&gt;Несоблюдение контрактов должно быть обнаружено на этапе тестирования и дополняет все виды тестов: модульные интеграционные и т. д.&lt;/p&gt;
+&lt;p&gt;На первый взгляд, использование контрактов ведёт к усложнению разработки и ухудшает читаемость кода. На самом деле, всё как раз наоборот. Приверженцам статической типизации будет проще всего оценить пользу контрактов, потому что простейшим их вариантом является описание типов  в сигнатуре методов и функций.&lt;/p&gt;
+&lt;p&gt;Итак, какую пользу дают контракты:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Улучшают читаемость кода за счёт явного документирования.&lt;/li&gt;
+&lt;li&gt;Повышают надёжность кода, дополняя собой тестирование.&lt;/li&gt;
+&lt;li&gt;Позволяют компиляторам использовать низкоуровневые оптимизации и генерировать более быстрый код в расчёте на соблюдение контракта. В последнем случае несоблюдение контракта в релизной сборке может вести к UB.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;контрактное-программирование-в-c&#34;
+    &gt;
+        Контрактное программирование в C++
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/archive/2019/03/cpp-contracts/#контрактное-программирование-в-c&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Контрактное программирование в C&amp;#43;&amp;#43;&#34; href=&#34;#%d0%ba%d0%be%d0%bd%d1%82%d1%80%d0%b0%d0%ba%d1%82%d0%bd%d0%be%d0%b5-%d0%bf%d1%80%d0%be%d0%b3%d1%80%d0%b0%d0%bc%d0%bc%d0%b8%d1%80%d0%be%d0%b2%d0%b0%d0%bd%d0%b8%d0%b5-%d0%b2-c&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Контрактное программирование реализовано во многих языках. Наиболее яркие примеры, это &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://www.eiffel.org/doc/eiffel/ET-_Design_by_Contract_%28tm%29%2C_Assertions_and_Exceptions&#34;
+&gt;Eiffel&lt;/a&gt;, где парадигма была впервые реализована, и &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://dlang.org/spec/contracts.html&#34;
+&gt;D&lt;/a&gt;, в D контракты являются частью языка.&lt;/p&gt;
+&lt;p&gt;В C++, до стандарта C++20, контракты можно было использовать в виде отдельных библиотек.&lt;/p&gt;
+&lt;p&gt;Такой подход имеет ряд недостатков:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Весьма неуклюжий синтаксис с использованием макросов.&lt;/li&gt;
+&lt;li&gt;Отсутствие единого стиля.&lt;/li&gt;
+&lt;li&gt;Невозможность использования контрактов компилятором для оптимизации кода.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;В основе библиотечных реализаций обычно лежит использование старого доброго assert&amp;rsquo;а и препроцессорных директив, проверяющих наличие флага компиляции.&lt;/p&gt;
+&lt;p&gt;Использование контрактов в таком виде, действительно делает код уродливым и нечитаемым. Это одна из причин, почему использование контрактов в C++ мало практикуется.&lt;/p&gt;
+&lt;p&gt;Забегая вперёд, покажу как в C++20 будет выглядеть использование контрактов.
+А затем, разберём всё это подробнее:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;f&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;y&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;na&#34;&gt;[[ expects: x &amp;gt; 0 ]]&lt;/span&gt;       &lt;span class=&#34;c1&#34;&gt;// precondition
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;na&#34;&gt;[[ expects: y &amp;gt; 0 ]]&lt;/span&gt;       &lt;span class=&#34;c1&#34;&gt;// precondition
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;na&#34;&gt;[[ ensures r: r &amp;lt; x + y ]]&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// postcondition
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;z&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;%&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;y&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;y&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;na&#34;&gt;[[ assert: z &amp;gt;= 0 ]]&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;      &lt;span class=&#34;c1&#34;&gt;// assertion
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;z&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;+&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;y&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;пробуем&#34;
+    &gt;
+        Пробуем
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/archive/2019/03/cpp-contracts/#пробуем&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Пробуем&#34; href=&#34;#%d0%bf%d1%80%d0%be%d0%b1%d1%83%d0%b5%d0%bc&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;К сожалению, на текущий момент ни один из широко используемых компиляторов ещё не реализовал поддержку контрактов.
+Но есть выход.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;ARCOS research group&lt;/em&gt; из &lt;em&gt;Universidad Carlos III de Madrid&lt;/em&gt; реализовали экспериментальную поддержку контрактов в форке clang++.&lt;/p&gt;
+&lt;p&gt;Чтобы не «писать код на бумажке», а иметь возможность сразу же попробовать новые возможности в деле, мы можем собрать этот форк и с его помощью пробовать приводимые ниже примеры.&lt;/p&gt;
+&lt;p&gt;Инструкция по сборке описана в readme репозитория на Гитхабе
+&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/arcosuc3m/clang-contracts&#34;
+&gt;https://github.com/arcosuc3m/clang-contracts&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git clone https://github.com/arcosuc3m/clang-contracts/
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;mkdir -p clang-contracts/build/ &lt;span class=&#34;o&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; clang-contracts/build/
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;cmake -G &lt;span class=&#34;s2&#34;&gt;&amp;#34;Unix Makefiles&amp;#34;&lt;/span&gt; -DLLVM_USE_LINKER&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;gold -DBUILD_SHARED_LIBS&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;ON -DLLVM_USE_SPLIT_DWARF&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;ON  -DLLVM_OPTIMIZED_TABLEGEN&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;ON ../
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;make -j8
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;У меня не возникло проблем при сборке, но компиляция исходников занимает очень много времени.&lt;/p&gt;
+&lt;p&gt;Для компиляции примеров вам нужно будет явно указать путь к бинарнику clang++.
+Например, у меня это выглядит примерно так&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;/home/valmat/work/git/clang-contracts/build/bin/clang++ -std&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;c++2a -build-level&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;audit -g test.cpp -o test.bin
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Я подготовил примеры, чтобы вам было удобно исследовать контракты на примерах реального кода. Предлагаю, прежде чем приступить к чению следующего раздела, склонировать и скомпилировать примеры.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git clone https://github.com/valmat/cpp20-contracts-examples/
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; cpp20-contracts-examples
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;make &lt;span class=&#34;nv&#34;&gt;CPP&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;/path/to/clang++
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Здесь &lt;code&gt;/path/to/clang++&lt;/code&gt; путь к бинарнику &lt;code&gt;clang++&lt;/code&gt; вашей сборки экспериментального компилятора.&lt;/p&gt;
+&lt;p&gt;Кроме самого компилятора, ARCOS research group подготовили свою версию &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;http://fragata.arcos.inf.uc3m.es/&#34;
+&gt;Compiler Explorer&lt;/a&gt;  для своего форка.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;контрактное-программирование-в-c20&#34;
+    &gt;
+        Контрактное программирование в C++20
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/archive/2019/03/cpp-contracts/#контрактное-программирование-в-c20&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Контрактное программирование в C&amp;#43;&amp;#43;20&#34; href=&#34;#%d0%ba%d0%be%d0%bd%d1%82%d1%80%d0%b0%d0%ba%d1%82%d0%bd%d0%be%d0%b5-%d0%bf%d1%80%d0%be%d0%b3%d1%80%d0%b0%d0%bc%d0%bc%d0%b8%d1%80%d0%be%d0%b2%d0%b0%d0%bd%d0%b8%d0%b5-%d0%b2-c20&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Теперь ничего не мешает нам приступить к исследованию возможностей, которые даёт контрактное программирование, и сразу пробовать эти возможности в деле.&lt;/p&gt;
+&lt;p&gt;Как уже было сказано выше, контракты строятся из предусловий, постусловий и инвариантов (утверждений).&lt;/p&gt;
+&lt;p&gt;В C++20 для этого используются атрибуты со следующим синтаксисом&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;na&#34;&gt;[[contract-attribute modifier identifier: conditional-expression]]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Где &lt;code&gt;contract-attribute&lt;/code&gt; может принимать одно из следующих значений:
+&lt;strong&gt;expects&lt;/strong&gt;, &lt;strong&gt;ensures&lt;/strong&gt; или &lt;strong&gt;assert&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;expects&lt;/code&gt; используется для предусловий, &lt;code&gt;ensures&lt;/code&gt; для постусловий и &lt;code&gt;assert&lt;/code&gt; для утверждений.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;conditional-expression&lt;/code&gt; – это булево выражение, проверяемый в контракте предикат.
+&lt;code&gt;modifier&lt;/code&gt; и &lt;code&gt;identifier&lt;/code&gt; могут быть опущены.&lt;/p&gt;
+&lt;p&gt;Зачем нужен &lt;code&gt;modifier&lt;/code&gt; я напишу чуть ниже.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;identifier&lt;/code&gt; используется только с &lt;code&gt;ensures&lt;/code&gt; и служит для представления возвращаемого значения.&lt;/p&gt;
+&lt;p&gt;Предусловия имеют доступ к аргументам.&lt;/p&gt;
+&lt;p&gt;Постусловия имеют доступ к возвращаемому функцией значению. Для этого используется синтаксис&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;na&#34;&gt;[[ensures return_variable: expr(return_variable)]]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Где &lt;code&gt;return_variable&lt;/code&gt; любое валидное выражение для переменной.&lt;/p&gt;
+&lt;p&gt;Другими словами, предусловия предназначены, чтобы объявлять ограничения, накладываемые на принимаемые функцией аргументы, а постусловия для того, чтобы объявлять ограничения, накладываемые на возвращаемое функцией значение.&lt;/p&gt;
+&lt;p&gt;Считается, что &lt;em&gt;предусловия&lt;/em&gt; и &lt;em&gt;постусловия&lt;/em&gt; являются частью интерфейса функции, в то время как &lt;em&gt;утверждения&lt;/em&gt; являются частью её реализации.&lt;/p&gt;
+&lt;p&gt;Предикаты предусловий всегда вычисляются непосредственно перед выполнением функции. Постусловия выполняются сразу же после передачи функцией управления вызывающему коду.&lt;/p&gt;
+&lt;p&gt;Если в функции происходит выброс исключения, то постусловия не будет проверяться.
+Постусловия проверяются только в случае нормального завершения функции.&lt;/p&gt;
+&lt;p&gt;Если при проверке выражения в контракте возникло ислючение, то будет вызван &lt;code&gt;std::terminate()&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Предусловия и постусловия всегда описываются вне тела функции и не могут иметь доступ к локальным переменным.&lt;/p&gt;
+&lt;p&gt;Если предусловия и постусловия описывают контракт для публичного метода класса, они не могут иметь доступ к приватным и защищённым полям класса. Если метод класса защищённый, то к защищённым и публичным данным класса доступ есть, а к приватным нет.
+Последнее ограничение совершенно логично, если учесть, что контракт является частью интерфейса метода.&lt;/p&gt;
+&lt;p&gt;Утверждения (инварианты) всегда описываются в теле функции или метода. По дизайну они являются частью реализации. И, соответственно, могут иметь доступ ко всем доступным данным. В том числе, к локальным переменным функции и приватным и защищённым полям класса.&lt;/p&gt;
+&lt;p&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/cpp20-contracts-examples/blob/master/example1.cpp&#34;
+&gt;пример 1&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Определим два предусловия, одно постусловие и один инвариант:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;foo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;y&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;na&#34;&gt;[[ expects: x &amp;gt; y ]]&lt;/span&gt;   &lt;span class=&#34;c1&#34;&gt;// precondition  #1
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;na&#34;&gt;[[ expects: y &amp;gt; 0 ]]&lt;/span&gt;   &lt;span class=&#34;c1&#34;&gt;// precondition  #2
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;na&#34;&gt;[[ ensures r: r &amp;lt; x ]]&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// postcondition #3
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;z&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;%&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;y&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;y&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;na&#34;&gt;[[ assert: z &amp;gt;= 0 ]]&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;// assertion
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;z&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;cout&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;foo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;117&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;20&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;endl&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;cout&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;foo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;  &lt;span class=&#34;mi&#34;&gt;20&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;endl&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// &amp;lt;-- contract violation #1
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;cout&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;foo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;100&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;endl&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// &amp;lt;-- contract violation #2
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/cpp20-contracts-examples/blob/master/example2.cpp&#34;
+&gt;пример 2&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Предусловие публичного метода не может ссылаться на защищённое или приватное поле:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;struct&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;X&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;//protected:
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;m&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;public&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;foo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;na&#34;&gt;[[expects: n &amp;lt; m]]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;};&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Не допускается модификация переменных внутри выражений, описываемых атрибутами контракта. Если это нарушено, будет UB.&lt;/p&gt;
+&lt;p&gt;Выражения, описываемые в контрактах, не должны иметь побочных эффектов. Хотя компиляторы могот это проверять, такая обязанность на них не возлагается. Нарушение этого требования считается неопределённым поведением.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;struct&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;X&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;m&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;foo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;na&#34;&gt;[[ expects: n &amp;lt; m++ ]]&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;// UB: Modifies variable m
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;k&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;na&#34;&gt;[[ assert: ++k &amp;lt; 100 ]]&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// UB: Modifies variable k
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;};&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Требование не изменять состояние программы в выражениях контрактов станет очевидно чуть ниже, когда я расскажу про уровни модификаторов контрактов и режимы сборки.&lt;/p&gt;
+&lt;p&gt;Сейчас просто отмечу, что корректная программа должна работать так же, как если бы контрактов вообще не было.&lt;/p&gt;
+&lt;p&gt;Как я отмечал выше, в контракте можно указывать сколько угодно предусловий и постусловий.
+Все они будут проверены по порядку. Но  предусловия всегда проверяются до выполнения функции, а постусловия сразу после выхода из неё.&lt;/p&gt;
+&lt;p&gt;Это означает, что в первую очередь всегда проверяются предусловия, как проиллюстрировано в следующем примере:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;foo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;na&#34;&gt;[[ expects:   expr(n) ]]&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// # 1
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;na&#34;&gt;[[ ensures r: expr(r) ]]&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// # 4
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;na&#34;&gt;[[ expects:   expr(n) ]]&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// # 2
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;na&#34;&gt;[[ expects:   expr(n) ]]&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// # 3
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;na&#34;&gt;[[ ensures r: expr(r) ]]&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// # 5
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{...}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Выражения в постусловиях могут ссылаться не только на возвращаемое функцией значение, но и на аргументы функции.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;foo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;na&#34;&gt;[[ ensures: expr(r) ]]&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;В этом случае можно опустить идентификатор возвращаемого значения.&lt;/p&gt;
+&lt;p&gt;Если постусловие ссылается на аргумент функции, то этот аргумент рассматривается &lt;em&gt;в точке выхода из функции&lt;/em&gt;, а не в точке входа, как в случае с предусловиями.&lt;/p&gt;
+&lt;p&gt;Нет никакого способа ссылаться на оригинальное (в точке входа в функцию) значение в постусловии.&lt;/p&gt;
+&lt;p&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/cpp20-contracts-examples/blob/master/example3.cpp&#34;
+&gt;пример&lt;/a&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;incr&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;na&#34;&gt;[[ expects: 3 == n ]]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;na&#34;&gt;[[ ensures: 4 == n ]]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;++&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Предикаты в контрактах могут ссылаться на локальные переменные, только если время жизни этих переменных соответствует времени вычисления предиката.&lt;/p&gt;
+&lt;p&gt;Например, для &lt;code&gt;constexpr&lt;/code&gt; функции нельзя ссылаться на локальные переменные, если только они не известны во время компиляции.&lt;/p&gt;
+&lt;p&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/cpp20-contracts-examples/blob/master/example4.cpp&#34;
+&gt;пример&lt;/a&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;a&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;constexpr&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;b&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;100&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;constexpr&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;foo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;na&#34;&gt;[[ expects: a &amp;lt;= n ]]&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// error: `a` is not constexpr
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;na&#34;&gt;[[ expects: n &amp;lt;  b ]]&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// OK
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;na&#34;&gt;[[assert: n &amp;gt; 2*a]]&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;// error: `a` is not constexpr
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;na&#34;&gt;[[assert: n &amp;lt; 2*b]]&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;  &lt;span class=&#34;c1&#34;&gt;// OK
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;контракты-для-указателей-на-функцию&#34;
+    &gt;
+        Контракты для указателей на функцию
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/archive/2019/03/cpp-contracts/#контракты-для-указателей-на-функцию&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Контракты для указателей на функцию&#34; href=&#34;#%d0%ba%d0%be%d0%bd%d1%82%d1%80%d0%b0%d0%ba%d1%82%d1%8b-%d0%b4%d0%bb%d1%8f-%d1%83%d0%ba%d0%b0%d0%b7%d0%b0%d1%82%d0%b5%d0%bb%d0%b5%d0%b9-%d0%bd%d0%b0-%d1%84%d1%83%d0%bd%d0%ba%d1%86%d0%b8%d1%8e&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Нельзя определить контракты для указателя на функцию, но указателю на функцию можно присвоить адрес функции, для которой определён контракт.&lt;/p&gt;
+&lt;p&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/cpp20-contracts-examples/blob/master/example5.cpp&#34;
+&gt;пример&lt;/a&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;foo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;na&#34;&gt;[[expects: n &amp;lt; 10]]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;pfoo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;foo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Вызов &lt;code&gt;pfoo(100)&lt;/code&gt; приведёт к нарушению контракта.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;контракты-при-наследовании&#34;
+    &gt;
+        Контракты при наследовании
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/archive/2019/03/cpp-contracts/#контракты-при-наследовании&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Контракты при наследовании&#34; href=&#34;#%d0%ba%d0%be%d0%bd%d1%82%d1%80%d0%b0%d0%ba%d1%82%d1%8b-%d0%bf%d1%80%d0%b8-%d0%bd%d0%b0%d1%81%d0%bb%d0%b5%d0%b4%d0%be%d0%b2%d0%b0%d0%bd%d0%b8%d0%b8&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Классическая реализация концепции контрактов предполагает, что предусловия могут быть ослаблены в подклассах, постусловия и инварианты могут быть усилены в подклассах.&lt;/p&gt;
+&lt;p&gt;В реализации C++20 это не так.&lt;/p&gt;
+&lt;p&gt;Во-первых, инварианты в C++20 являются частью реализации, а не интерфейса. По этой причине, их можно как усилить, так и ослабить. Если в реализации виртуальной функции &lt;code&gt;assert&lt;/code&gt; отсутствует, то он не будет унаследован.&lt;/p&gt;
+&lt;p&gt;Во-вторых, требуется, чтобы при наследовании функции были &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://ru.wikipedia.org/wiki/%D0%9F%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%BE_%D0%BE%D0%B4%D0%BD%D0%BE%D0%B3%D0%BE_%D0%BE%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F&#34;
+&gt;ODR&lt;/a&gt; идентичны.
+А, поскольку предусловия и постусловия являются частью интерфейса, то в наследнике они должны в точности совпадать.&lt;/p&gt;
+&lt;p&gt;При этом, описание предусловий и постусловий при наследовании можно опустить. Но если они объявлены, то должны в точности совпадать с определением в базовом классе.&lt;/p&gt;
+&lt;p&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/cpp20-contracts-examples/blob/master/example6-inheritance.cpp&#34;
+&gt;пример&lt;/a&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;struct&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;Base&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;virtual&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;foo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;na&#34;&gt;[[ expects:   n &amp;lt; 10  ]]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;na&#34;&gt;[[ ensures r: r &amp;gt; 100 ]]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;};&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;struct&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;Derived1&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Base&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;virtual&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;foo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;override&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;na&#34;&gt;[[ expects:   n &amp;lt; 10  ]]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;na&#34;&gt;[[ ensures r: r &amp;gt; 100 ]]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;};&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;struct&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;Derived2&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;Base&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;c1&#34;&gt;// Inherits contracts from Base
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;k&#34;&gt;virtual&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;foo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;override&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;};&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;&amp;lt;spoiler title=&amp;quot;Замечание&amp;quot;&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;К сожалению, пример выше &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/arcosuc3m/clang-contracts/issues/18&#34;
+&gt;не работает&lt;/a&gt; в экспериментальном компиляторе как ожидается.&lt;/p&gt;
+&lt;p&gt;Если у &lt;code&gt;foo&lt;/code&gt; из  &lt;code&gt;Derived2&lt;/code&gt; опустить контракт, то он не будет унаследован из базового класса. Кроме того, компилятор позволяет определить для подкласса контракт несовпадающий с контрактом базового.&lt;/p&gt;
+&lt;p&gt;Ещё одна &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/arcosuc3m/clang-contracts/issues/20&#34;
+&gt;ошибка&lt;/a&gt; экспериментального компилятора: синтаксически правильной должна быть запись&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;virtual&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;foo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;override&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;na&#34;&gt;[[expects: n &amp;lt; 10]]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{...}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Однако в таком виде я получил ошибку компиляции&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;inheritance1.cpp:20:36: error: expected &lt;span class=&#34;s1&#34;&gt;&amp;#39;;&amp;#39;&lt;/span&gt; at end of declaration list
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    virtual int foo&lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;int n&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; override
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                                   ^
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                                   &lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;и пришлось заменить на&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;virtual&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;foo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;na&#34;&gt;[[expects: n &amp;lt; 10]]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;override&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{...}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Думаю, это связано с особенностью экспериментального компилятора, и в релизных версиях компиляторов будет работать синтаксически верный код.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;&amp;lt;/spoiler&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;модификаторы-контрактов&#34;
+    &gt;
+        Модификаторы контрактов
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/archive/2019/03/cpp-contracts/#модификаторы-контрактов&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Модификаторы контрактов&#34; href=&#34;#%d0%bc%d0%be%d0%b4%d0%b8%d1%84%d0%b8%d0%ba%d0%b0%d1%82%d0%be%d1%80%d1%8b-%d0%ba%d0%be%d0%bd%d1%82%d1%80%d0%b0%d0%ba%d1%82%d0%be%d0%b2&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Проверки предикатов контрактов могут нести дополнительные вычислительные расходы.
+Поэтому распространённой практикой является проверка контрактов в девелоперской и тестовой сборках и их игнорирование в релизной сборке.&lt;/p&gt;
+&lt;p&gt;Для этх целей стандарт предлагает три уровня модификаторов контрактов. С помощью модификаторов и ключей компилятора программист может управлять тем, какие контакты будут проверяться в сборке, а какие игнорироваться.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;default&lt;/code&gt; – этот модификатор используется по умолчанию. Предполагается, что  вычислительная стоимость проверки выполнения выражения с этим модификатором &lt;em&gt;небольшая&lt;/em&gt;, по сравнению со стоимостью вычисления самой функции.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;audit&lt;/code&gt;  – этот модификатор предполагает, что  вычислительная стоимость проверки выполнения выражения &lt;em&gt;значительна&lt;/em&gt; по сравнению со стоимостью вычисления самой функции.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;axiom&lt;/code&gt;  – этот модификатор используется, если выражение носит декларативный характер. Не проверяется во время выполнения. Служит для документирования интерфейса функции, использования статическими анализаторами и оптимизатором компилятора. Выражения с модификатором &lt;code&gt;axiom&lt;/code&gt; никогда не вычисляются во время выполнения.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Пример&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;na&#34;&gt;[[expects: expr]]&lt;/span&gt;         &lt;span class=&#34;c1&#34;&gt;// Неявно default
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;[[expects default: expr]]&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// Явно default
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;[[expects axiom  : expr]]&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// Run-time проверки не выполняются
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;[[expects audit  : expr]]&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// Вычислительно дорогая проверка
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Используя модификаторы, можно определить какие проверки в каких версиях ваших сборок будут использоваться, а какие будут отключены.&lt;/p&gt;
+&lt;p&gt;Стоит отметить, что если даже проверка не выполняется, компилятор вправе использовать контракт для низкоуровневых оптимизаций. И хотя проверка контракта может быть отключена флагом компиляции, нарушение контракта ведёт к неопределённому поведению программы.&lt;/p&gt;
+&lt;p&gt;На усмотрение компилятора, могут быть предоставлены средства для включения проверок выражений, помеченных как  &lt;code&gt;axiom&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;В нашем случае, это опция компилятора&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;-axiom-mode=&amp;lt;mode&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;-axiom-mode=on&lt;/code&gt; &lt;em&gt;включает&lt;/em&gt; режим аксиом и, соответственно, &lt;em&gt;выключает&lt;/em&gt; проверку утверждений с идентификатором &lt;code&gt;axiom&lt;/code&gt;,&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;-axiom-mode=off&lt;/code&gt; &lt;em&gt;выключает&lt;/em&gt; режим аксиом и, соответственно, &lt;em&gt;включает&lt;/em&gt; проверку утверждений с идентификатором &lt;code&gt;axiom&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/cpp20-contracts-examples/blob/master/example7-axiom.cpp&#34;
+&gt;пример&lt;/a&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;foo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;na&#34;&gt;[[expects axiom: n &amp;lt; 10]]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Программа может быть скомпилирована с тремя разными уровнями проверки:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;off&lt;/code&gt; выключает все проверки выражений в контрактах&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;default&lt;/code&gt; проверяются только выражения с модификатором &lt;code&gt;default&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;audit&lt;/code&gt; расширенный режим, когда выполняются все проверки с модификатором &lt;code&gt;default&lt;/code&gt; и &lt;code&gt;audit&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Как именно реализовывать установку уровня проверки отводится на усмотрение разработчиков компилятора.&lt;/p&gt;
+&lt;p&gt;В нашем случае, для этого используется опция компилятора&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;-build-level&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&amp;lt;off&lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;default&lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;audit&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;По умолчанию используется &lt;code&gt;-build-level=default&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Как уже было сказано, компилятор может использовать контракты для низкоуровневых оптимизаций. По этой причине, не смотря на то, что во время выполнения некоторые предикаты в контрактах (в зависимости от уровня проверки) могут не вычисляться, их невыполнение ведёт к неопределённому поведению.&lt;/p&gt;
+&lt;p&gt;Примеры применения уровней сборки отложу до следующего раздела, там их можно будет сделать наглядными.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;перехват-нарушения-контракта&#34;
+    &gt;
+        Перехват нарушения контракта
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/archive/2019/03/cpp-contracts/#перехват-нарушения-контракта&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Перехват нарушения контракта&#34; href=&#34;#%d0%bf%d0%b5%d1%80%d0%b5%d1%85%d0%b2%d0%b0%d1%82-%d0%bd%d0%b0%d1%80%d1%83%d1%88%d0%b5%d0%bd%d0%b8%d1%8f-%d0%ba%d0%be%d0%bd%d1%82%d1%80%d0%b0%d0%ba%d1%82%d0%b0&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;В зависимости от того, с какими опциями собирается программа, в случае нарушения контракта могут быть разные сценарии поведения.&lt;/p&gt;
+&lt;p&gt;По умолчанию нарушение контракта ведёт к падению программы, вызову &lt;code&gt;std::termenate()&lt;/code&gt;. Но программист может переопределить это поведение, предоставив свой обработчик и указав компилятору на необходимость продолжать работу программы после нарушения контракта.&lt;/p&gt;
+&lt;p&gt;При компиляции можно установить обработчик &lt;em&gt;violation handler&lt;/em&gt;, вызываемый при нарушении контракта.&lt;/p&gt;
+&lt;p&gt;Способ реализация установки обработчика отводится на усмотрение создателей компилятора.&lt;/p&gt;
+&lt;p&gt;В нашем случае это&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;-contract-violation-handler&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&amp;lt;violation_handler&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Сигнатура обработчика должна иметь вид&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;contract_violation&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;info&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;или&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;contract_violation&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;info&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;noexcept&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;std::contract_violation&lt;/code&gt; эквивалентна следующему определению:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;k&#34;&gt;struct&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;contract_violation&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;kt&#34;&gt;uint_least32_t&lt;/span&gt;   &lt;span class=&#34;nf&#34;&gt;line_number&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;     &lt;span class=&#34;k&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;noexcept&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;string_view&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;file_name&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;       &lt;span class=&#34;k&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;noexcept&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;string_view&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;function_name&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;   &lt;span class=&#34;k&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;noexcept&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;string_view&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;comment&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;         &lt;span class=&#34;k&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;noexcept&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;string_view&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;assertion_level&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;noexcept&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;};&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Таким образом, обработчик позволяет получить достаточно исчерпывающую информацию о том, где именно и при каких условиях произошло нарушение контракта.&lt;/p&gt;
+&lt;p&gt;Если обработчик &lt;em&gt;violation handler&lt;/em&gt; задан, то, в случае нарушения контракта, по умолчанию, сразу после его выполнения будет вызван &lt;code&gt;std::abort()&lt;/code&gt; (Без указания обработчика вызывается &lt;code&gt;std::terminate()&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;Стандарт предполагает, что компиляторы предоставляют средства, позволяющие программистам продолжить выполнение программы после нарушения контракта.&lt;/p&gt;
+&lt;p&gt;Способ реализации этих средств остаётся на усмотрение разработчиков компилятора.
+В нашем случае, это опция компилятора&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;-fcontinue-after-violation
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Опции &lt;code&gt;-fcontinue-after-violation&lt;/code&gt; и &lt;code&gt;-contract-violation-handler&lt;/code&gt; могут быть установлены независимо друг от друга. Например, можно установить &lt;code&gt;-fcontinue-after-violation&lt;/code&gt;, но не устанавливать &lt;code&gt;-contract-violation-handler&lt;/code&gt;. В последнем случае, после нарушения контракта программа просто продолжит работу.&lt;/p&gt;
+&lt;p&gt;Возможность продолжения работы программы после нарушения контракта специфицирована стандартом, но нужно подходить с осторожностью к этой возможности.&lt;/p&gt;
+&lt;p&gt;Технически, поведение программы после нарушения контракта не определено, даже если программист явно указал, что программа должна продолжать работать.&lt;/p&gt;
+&lt;p&gt;Это связано с возможностью компилятора выполнять низкоуровневые оптимизации в рассчёте на выполнение конрактов.&lt;/p&gt;
+&lt;p&gt;В идеале, если произошло нарушение конракта, нужно как можно скорее записать диагностическую информацию и завершить работу программы. Нужно точно понимать, что вы делаете позволяя программе работать после violation.&lt;/p&gt;
+&lt;p&gt;Определим &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/cpp20-contracts-examples/blob/master/violation_handler.h&#34;
+&gt;свой обработчик&lt;/a&gt; и с его помощью перехватим нарушение конракта&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;violation_handler&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;contract_violation&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;info&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;cerr&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;line_number     : &amp;#34;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;info&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;line_number&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;     &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;endl&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;cerr&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;file_name       : &amp;#34;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;info&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;file_name&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;       &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;endl&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;cerr&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;function_name   : &amp;#34;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;info&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;function_name&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;   &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;endl&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;cerr&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;comment         : &amp;#34;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;info&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;comment&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;         &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;endl&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;cerr&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;assertion_level : &amp;#34;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;info&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;assertion_level&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;endl&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;И рассмотрим &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/cpp20-contracts-examples/blob/master/example8-handling.cpp&#34;
+&gt;пример&lt;/a&gt; нарушения конракта:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;#include&lt;/span&gt; &lt;span class=&#34;cpf&#34;&gt;&amp;#34;violation_handler.h&amp;#34;&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;foo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;na&#34;&gt;[[expects: n &amp;lt; 10]]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;foo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;100&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// &amp;lt;-- contract violation
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Скомпилируем программу с опциями &lt;code&gt;-contract-violation-handler=violation_handler&lt;/code&gt; и &lt;code&gt;-fcontinue-after-violation&lt;/code&gt; и запустим&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/example8-handling.bin
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;line_number     : &lt;span class=&#34;m&#34;&gt;4&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;file_name       : example8-handling.cpp
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;function_name   : foo
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;comment         : n &amp;lt; &lt;span class=&#34;m&#34;&gt;10&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;assertion_level : default
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Теперь можно привести примеры, демонстрирующие поведение программы при нарушении контракта при разных уровнях сборки и режимах контрактов.&lt;/p&gt;
+&lt;p&gt;Рассмотрим следующий &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/cpp20-contracts-examples/blob/master/example9.cpp&#34;
+&gt;пример&lt;/a&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;#include&lt;/span&gt; &lt;span class=&#34;cpf&#34;&gt;&amp;#34;violation_handler.h&amp;#34;&lt;/span&gt;&lt;span class=&#34;cp&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;foo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;na&#34;&gt;[[ expects axiom   : n &amp;lt; 100 ]]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;na&#34;&gt;[[ expects default : n &amp;lt; 200 ]]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;na&#34;&gt;[[ expects audit   : n &amp;lt; 300 ]]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;2&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;*&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;foo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;350&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// audit
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;n&#34;&gt;foo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;250&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// default
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Если собрать его с опцией &lt;code&gt;-build-level=off&lt;/code&gt; то как и ожидается, конракты не будут проверяться.&lt;/p&gt;
+&lt;p&gt;Собрав с уровнем &lt;code&gt;default&lt;/code&gt; (с опцией &lt;code&gt;-build-level=default&lt;/code&gt;), получим следующий вывод:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$ bin/example9-default.bin
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;line_number     : &lt;span class=&#34;m&#34;&gt;5&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;file_name       : example9.cpp
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;function_name   : foo
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;comment         : n &amp;lt; &lt;span class=&#34;m&#34;&gt;200&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;assertion_level : default
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;line_number     : &lt;span class=&#34;m&#34;&gt;5&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;file_name       : example9.cpp
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;function_name   : foo
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;comment         : n &amp;lt; &lt;span class=&#34;m&#34;&gt;200&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;assertion_level : default
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;И сборка с уровнем &lt;code&gt;audit&lt;/code&gt; даст:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; $ bin/example9-audit.bin
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;line_number     : &lt;span class=&#34;m&#34;&gt;5&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;file_name       : example9.cpp
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;function_name   : foo
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;comment         : n &amp;lt; &lt;span class=&#34;m&#34;&gt;200&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;assertion_level : default
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;line_number     : &lt;span class=&#34;m&#34;&gt;6&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;file_name       : example9.cpp
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;function_name   : foo
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;comment         : n &amp;lt; &lt;span class=&#34;m&#34;&gt;300&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;assertion_level : audit
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;line_number     : &lt;span class=&#34;m&#34;&gt;5&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;file_name       : example9.cpp
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;function_name   : foo
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;comment         : n &amp;lt; &lt;span class=&#34;m&#34;&gt;200&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;assertion_level : default
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;замечания&#34;
+    &gt;
+        Замечания
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/archive/2019/03/cpp-contracts/#замечания&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Замечания&#34; href=&#34;#%d0%b7%d0%b0%d0%bc%d0%b5%d1%87%d0%b0%d0%bd%d0%b8%d1%8f&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;violation_handler&lt;/code&gt; может бросать исключения. В этом случае можно настроить программу так, чтобы нарушение контракта вело к выбросу исключения.&lt;/p&gt;
+&lt;p&gt;Если функция, у которой описаны контракты, помечена как &lt;code&gt;noexcept&lt;/code&gt; и при проверке контракта вызван &lt;code&gt;violation_handler&lt;/code&gt;, который бросает исключение, то будет вызван &lt;code&gt;std::terminate()&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/cpp20-contracts-examples/blob/master/example11.cpp&#34;
+&gt;Пример&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-cpp&#34; data-lang=&#34;cpp&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;violation_handler&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;contract_violation&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;throw&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;std&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;exception&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;foo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;noexcept&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;na&#34;&gt;[[ expects: n  &amp;gt; 0 ]]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;*&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;foo&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// &amp;lt;-- std::terminate() when violation handler throws an exception
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;    &lt;span class=&#34;k&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Если компилятору передан флаг: не продолжать выполнение программы после нарушения контракта (&lt;code&gt;continuation mode=off&lt;/code&gt;), но обработчик violation handler бросает исключение, то будет принудительно вызвана &lt;code&gt;std::terminate()&lt;/code&gt;.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;заключение&#34;
+    &gt;
+        Заключение
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/archive/2019/03/cpp-contracts/#заключение&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Заключение&#34; href=&#34;#%d0%b7%d0%b0%d0%ba%d0%bb%d1%8e%d1%87%d0%b5%d0%bd%d0%b8%d0%b5&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Контракты относятся к неинтрузивным проверкам времени выполнения. Они играют очень важную роль в обеспечении качества выпускаемого программного обеспечения.&lt;/p&gt;
+&lt;p&gt;C++ используется очень широко. И наверняка найдётся достаточное количество притензий к спецификации контрактов. На мой субъективный взгляд, реализация получилась довольно удобной и наглядной.&lt;/p&gt;
+&lt;p&gt;Контракты C++20 позволят сделать наши программы ещё более надёжными, быстрыми и понятными. С нетерпением жду их реализацию в компиляторах.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;ссылки&#34;
+    &gt;
+        Ссылки
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/archive/2019/03/cpp-contracts/#ссылки&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Ссылки&#34; href=&#34;#%d1%81%d1%81%d1%8b%d0%bb%d0%ba%d0%b8&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://gist.github.com/valmat/91b5a7eae275b9ed9e6824d975da151f&#34;
+&gt;Gist&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://habr.com/ru/articles/443766/&#34;
+&gt;Habr&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+            </content>    
+                                <category scheme="https://valmat.ru/tags/cpp" term="cpp" label="cpp" />
+        </entry>
+        <entry>
+            <title>CRTP и двойной статическая полиморфизм C&#43;&#43;</title>
+            <link href="https://valmat.ru/posts/archive/2018/03/crtp-cpp/" rel="alternate" type="text/html"  hreflang="en" />
+            <id>https://valmat.ru/posts/archive/2018/03/crtp-cpp/</id>
+            <published>2018-03-27T12:00:00+03:00</published>
+            <updated>2018-03-27T12:00:00+03:00</updated>
+            <content type="html">
+                &lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;crtp-и-двойной-статическая-полиморфизм&#34;
+    &gt;
+        CRTP и двойной статическая полиморфизм
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/archive/2018/03/crtp-cpp/#crtp-и-двойной-статическая-полиморфизм&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor CRTP и двойной статическая полиморфизм&#34; href=&#34;#crtp-%d0%b8-%d0%b4%d0%b2%d0%be%d0%b9%d0%bd%d0%be%d0%b9-%d1%81%d1%82%d0%b0%d1%82%d0%b8%d1%87%d0%b5%d1%81%d0%ba%d0%b0%d1%8f-%d0%bf%d0%be%d0%bb%d0%b8%d0%bc%d0%be%d1%80%d1%84%d0%b8%d0%b7%d0%bc&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Ниже представлен паттерн проектирования на C++, известный как &lt;strong&gt;CRTP (Curiously Recurring Template Pattern)&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;С его помощью реализовать двойной статический полиморфизм. Пример ниже демонстрирует, как можно строить иерархии классов с использованием шаблонов для достижения поведения, похожего на виртуальные функции, но без накладных расходов раннего связывания.&lt;/p&gt;
+&lt;script src=&#34;https://gist.github.com/valmat/5c630e0c0a25f9087abc180a616ced4c.js&#34;&gt;&lt;/script&gt;
+
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;зачем-нужен-этот-код&#34;
+    &gt;
+        Зачем нужен этот код?
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/archive/2018/03/crtp-cpp/#зачем-нужен-этот-код&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Зачем нужен этот код?&#34; href=&#34;#%d0%b7%d0%b0%d1%87%d0%b5%d0%bc-%d0%bd%d1%83%d0%b6%d0%b5%d0%bd-%d1%8d%d1%82%d0%be%d1%82-%d0%ba%d0%be%d0%b4&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Обычный полиморфизм в C++ реализуется через виртуальные функции и наследование, что приводит к использованию виртуальной таблицы (vtable) и некоторым накладным расходам. Однако иногда нам требуется полиморфизм без этих издержек, особенно если все типы известны на этапе компиляции. Здесь на помощь приходит CRTP — паттерн, при котором класс-наследник передаёт себя как параметр шаблона базовому классу.&lt;/p&gt;
+&lt;p&gt;В данном примере мы не просто реализуем классический CRTP, но и демонстрируем &lt;strong&gt;двойной статический полиморфизм&lt;/strong&gt;: шаблонные базовые классы зависят сразу от двух параметров, что позволяет гибко комбинировать реализацию и интерфейс.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;что-делает-этот-код&#34;
+    &gt;
+        Что делает этот код?
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/archive/2018/03/crtp-cpp/#что-делает-этот-код&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Что делает этот код?&#34; href=&#34;#%d1%87%d1%82%d0%be-%d0%b4%d0%b5%d0%bb%d0%b0%d0%b5%d1%82-%d1%8d%d1%82%d0%be%d1%82-%d0%ba%d0%be%d0%b4&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;WordGetterBase&lt;/strong&gt; — базовый шаблонный класс, реализующий интерфейс для получения строки (&lt;code&gt;getWord()&lt;/code&gt;) и вывода её в консоль (&lt;code&gt;printWord()&lt;/code&gt;). Реализация метода &lt;code&gt;getWord()&lt;/code&gt; делегируется классу-наследнику через CRTP.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;WordGetterW1&lt;/strong&gt; и &lt;strong&gt;WordGetterW2&lt;/strong&gt; — конкретные реализации, возвращающие разные строки.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;StrPrinterBase&lt;/strong&gt; — ещё один шаблонный базовый класс, который наследуется от конкретного WordGetter и расширяет интерфейс методом &lt;code&gt;printStr()&lt;/code&gt;. Он также использует CRTP для вызова метода наследника.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;StrPrinter1&lt;/strong&gt; и &lt;strong&gt;StrPrinter2&lt;/strong&gt; — конкретные реализации принтера, которые форматируют и выводят строку, полученную от соответствующего WordGetter.&lt;/li&gt;
+&lt;li&gt;В функции &lt;code&gt;main&lt;/code&gt; демонстрируется использование этих классов: выводятся строки напрямую через WordGetter&amp;rsquo;ы и с помощью различных StrPrinter&amp;rsquo;ов.&lt;/li&gt;
+&lt;/ol&gt;
+
+            </content>    
+                                <category scheme="https://valmat.ru/tags/cpp" term="cpp" label="cpp" />
+        </entry>
+</feed>

@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <generator uri="https://gohugo.io/" version="0.152.1">Hugo</generator>
+    <title>Useful on Valmat&#39;s Personal Blog</title>
+            <link href="https://valmat.ru/tags/useful/" rel="alternate" type="text/html" title="html" />
+            <link href="https://valmat.ru/tags/useful/feed.xml" rel="self" type="application/atom+xml" title="atom" />
+    <updated>2025-10-23T01:37:11+03:00</updated>
+    <id>https://valmat.ru/tags/useful/</id>
+        <entry>
+            <title>Утилиты для извлечения изображений и текста из PDF</title>
+            <link href="https://valmat.ru/posts/2023/11/pdf-extract/" rel="alternate" type="text/html"  hreflang="en" />
+            <id>https://valmat.ru/posts/2023/11/pdf-extract/</id>
+            <published>2023-11-16T12:00:00+03:00</published>
+            <updated>2023-11-16T12:00:00+03:00</updated>
+            <content type="html">
+                &lt;p&gt;В повседневной работе часто возникает задача быстро извлечь изображения или текст из PDF-документов — будь то подготовка презентаций, анализ документов, создание датасетов или автоматизация обработки большого количества файлов. Стандартные графические редакторы или онлайн-сервисы либо требуют ручной работы, либо работают медленно, либо не позволяют автоматизировать процесс.&lt;/p&gt;
+&lt;p&gt;Чтобы упростить и ускорить решение этих задач, я написал набор утилит на C++ — &lt;strong&gt;PDF2Images&lt;/strong&gt;. Они позволяют:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Мгновенно извлекать все изображения из PDF-файлов в нужном формате (png, jpg, tiff и др.)&lt;/li&gt;
+&lt;li&gt;Получать текст с разбивкой по страницам или в один файл&lt;/li&gt;
+&lt;li&gt;Гибко настраивать параметры извлечения: диапазон страниц, формат выходных файлов, разрешение и пр.&lt;/li&gt;
+&lt;li&gt;Использовать утилиты в автоматических скриптах и пайплайнах&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Я сам ежедневно использую эти инструменты для подготовки скриншотов и текстовых выборок из PDF, а также для построения RAG (Retrieval-Augmented Generation) — когда нужно быстро получить текстовую базу для дальнейшей работы с LLM.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;установка&#34;
+    &gt;
+        Установка
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2023/11/pdf-extract/#установка&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Установка&#34; href=&#34;#%d1%83%d1%81%d1%82%d0%b0%d0%bd%d0%be%d0%b2%d0%ba%d0%b0&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Для работы потребуется установленная библиотека poppler:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;apt install libpoppler-dev
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Далее клонируем репозиторий:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git clone --recursive https://github.com/valmat/pdf2images
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; pdf2images
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;или, если без &lt;code&gt;--recursive&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git clone https://github.com/valmat/pdf2images
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; pdf2images
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git submodule update --init --recursive
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Переходим в папку &lt;code&gt;src&lt;/code&gt; и собираем проект:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; src
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;make release
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Для debug-сборки можно использовать:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;make -j
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;извлечение-изображений&#34;
+    &gt;
+        Извлечение изображений
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2023/11/pdf-extract/#извлечение-изображений&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Извлечение изображений&#34; href=&#34;#%d0%b8%d0%b7%d0%b2%d0%bb%d0%b5%d1%87%d0%b5%d0%bd%d0%b8%d0%b5-%d0%b8%d0%b7%d0%be%d0%b1%d1%80%d0%b0%d0%b6%d0%b5%d0%bd%d0%b8%d0%b9&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;bin/extract_imgs.bin &amp;lt;input_file.pdf&amp;gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;options&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Основные опции:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;-i&lt;/code&gt;, &lt;code&gt;--input&lt;/code&gt; — путь к PDF-файлу&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-o&lt;/code&gt;, &lt;code&gt;--output&lt;/code&gt; — папка для сохранения изображений (по умолчанию &lt;code&gt;.&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-e&lt;/code&gt;, &lt;code&gt;--ext&lt;/code&gt; — формат изображений (по умолчанию &lt;code&gt;png&lt;/code&gt;, можно &lt;code&gt;jpg&lt;/code&gt;, &lt;code&gt;tiff&lt;/code&gt; и др.)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-f&lt;/code&gt;, &lt;code&gt;--from&lt;/code&gt; — первая страница для обработки (по умолчанию 1)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-l&lt;/code&gt;, &lt;code&gt;--lim&lt;/code&gt; — количество страниц для обработки (по умолчанию нет ограничений)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-x&lt;/code&gt;, &lt;code&gt;--xres&lt;/code&gt;, &lt;code&gt;-y&lt;/code&gt;, &lt;code&gt;--yres&lt;/code&gt;, &lt;code&gt;-d&lt;/code&gt;, &lt;code&gt;--dpi&lt;/code&gt; — разрешение и dpi&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-g&lt;/code&gt;, &lt;code&gt;--gray&lt;/code&gt; — черно-белый режим&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-q&lt;/code&gt;, &lt;code&gt;--quiet&lt;/code&gt; — тихий режим (без вывода прогресса)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Пример:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;bin/extract_imgs.bin -i mydoc.pdf -o imgs -e jpg -f &lt;span class=&#34;m&#34;&gt;2&lt;/span&gt; -l &lt;span class=&#34;m&#34;&gt;5&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Извлечет изображения со 2 по 6 страницу в папку &lt;code&gt;imgs&lt;/code&gt; в формате jpg.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;извлечение-текста&#34;
+    &gt;
+        Извлечение текста
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2023/11/pdf-extract/#извлечение-текста&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Извлечение текста&#34; href=&#34;#%d0%b8%d0%b7%d0%b2%d0%bb%d0%b5%d1%87%d0%b5%d0%bd%d0%b8%d0%b5-%d1%82%d0%b5%d0%ba%d1%81%d1%82%d0%b0&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;bin/extract_txts.bin -i &amp;lt;input_file.pdf&amp;gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;options&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Основные опции:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;-i&lt;/code&gt;, &lt;code&gt;--input&lt;/code&gt; — входной PDF (обязательно)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-o&lt;/code&gt;, &lt;code&gt;--out-dir&lt;/code&gt; — папка для сохранения текстов (по умолчанию &lt;code&gt;./&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-O&lt;/code&gt;, &lt;code&gt;--out-file&lt;/code&gt; — имя выходного файла (если указано, все страницы будут в одном файле)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-f&lt;/code&gt;, &lt;code&gt;--from&lt;/code&gt; — первая страница для извлечения (по умолчанию 1)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-l&lt;/code&gt;, &lt;code&gt;--limit&lt;/code&gt; — сколько страниц извлекать (по умолчанию без ограничения)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-n&lt;/code&gt;, &lt;code&gt;--nopagebreak&lt;/code&gt; — не добавлять разделитель между страницами (актуально при сохранении в один файл)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Пример:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;bin/extract_txts.bin -i mydoc.pdf -O all_text.txt -f &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; -l &lt;span class=&#34;m&#34;&gt;10&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Извлечет текст с 1 по 10 страницу в файл &lt;code&gt;all_text.txt&lt;/code&gt;.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;Утилиты распространяются под лицензией MIT, исходники доступны на &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/pdf2images&#34;
+&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
+
+            </content>    
+                                <category scheme="https://valmat.ru/tags/useful" term="useful" label="useful" /> 
+                                <category scheme="https://valmat.ru/tags/LLM" term="LLM" label="LLM" /> 
+                                <category scheme="https://valmat.ru/tags/cpp" term="cpp" label="cpp" />
+        </entry>
+        <entry>
+            <title>Установка сертификатов LetsEncript</title>
+            <link href="https://valmat.ru/posts/archive/2018/05/letsencript/" rel="alternate" type="text/html"  hreflang="en" />
+            <id>https://valmat.ru/posts/archive/2018/05/letsencript/</id>
+            <published>2018-05-20T12:00:00+03:00</published>
+            <updated>2018-05-20T12:00:00+03:00</updated>
+            <content type="html">
+                &lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h1 id=&#34;установка-сертификатов-letsencript&#34;
+    &gt;
+        Установка сертификатов LetsEncript
+    &lt;/h1&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/archive/2018/05/letsencript/#установка-сертификатов-letsencript&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Установка сертификатов LetsEncript&#34; href=&#34;#%d1%83%d1%81%d1%82%d0%b0%d0%bd%d0%be%d0%b2%d0%ba%d0%b0-%d1%81%d0%b5%d1%80%d1%82%d0%b8%d1%84%d0%b8%d0%ba%d0%b0%d1%82%d0%be%d0%b2-letsencript&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Можно установить несколько сертификатов для разных доменов. Если по каким то причинам конфиг Nginx не позволяет вычленить домены то в site-avaible нужно поместить временный конфиг, в котором перечислены домены.
+потом его убрать и всё будет работать&lt;/p&gt;
+&lt;p&gt;Описание установки тут:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://certbot.eff.org/#ubuntuxenial-nginx&#34;
+&gt;https://certbot.eff.org/#ubuntuxenial-nginx&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://certbot.eff.org/docs/using.html#renewal&#34;
+&gt;https://certbot.eff.org/docs/using.html#renewal&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Установка пакетов:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;apt-get install software-properties-common
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;add-apt-repository ppa:certbot/certbot
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;apt-get update
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;apt-get install certbot python-certbot-nginx
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Затем можно устанавливать сертификат
+Что бы получить список опций certbot набираем certbot &amp;ndash;help&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;certbot &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;SUBCOMMAND&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;options&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;-d DOMAIN&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;-d DOMAIN&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; ...
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Установка тодлко сертификата без правок конфига:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;certbot --nginx certonly
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;При создании сертификата можно указать домены:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;certbot --nginx certonly  -d avtogs.ru -d www.avtogs.ru -d msk.avtogs.ru
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Если набрать &lt;code&gt;certbot --nginx&lt;/code&gt;
+То certbot попытается в конец конфига дописать включение сертификата&lt;/p&gt;
+&lt;p&gt;Проверка обновления:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;certbot renew --dry-run
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Ручное обновление:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;certbot renew
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Ручное обновление с перезапуском конфигов:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;certbot -q renew --post-hook &lt;span class=&#34;s2&#34;&gt;&amp;#34;service nginx reload&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;certbot renew --pre-hook &lt;span class=&#34;s2&#34;&gt;&amp;#34;service nginx stop&amp;#34;&lt;/span&gt; --post-hook &lt;span class=&#34;s2&#34;&gt;&amp;#34;service nginx start&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;certbot renew -a nginx --cert-name /etc/letsencrypt/renewal/my-domain.org
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;посмотреть сертификаты&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;certbot certificates
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Проверим полученный сертификат&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;openssl x509 -text -in /etc/letsencrypt/live/avtogs.ru/cert.pem
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;После установки можно попдправить Cron скрипт в /etc/cron.d  (  /etc/cron.d/certbot )&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;m&#34;&gt;22&lt;/span&gt; */12 * * * root &lt;span class=&#34;nb&#34;&gt;test&lt;/span&gt; -x /usr/bin/certbot -a &lt;span class=&#34;se&#34;&gt;\!&lt;/span&gt; -d /run/systemd/system &lt;span class=&#34;o&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; perl -e &lt;span class=&#34;s1&#34;&gt;&amp;#39;sleep int(rand(3600))&amp;#39;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; certbot -q renew --post-hook &lt;span class=&#34;s2&#34;&gt;&amp;#34;service nginx reload&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Что бы сертификаты заработали в конфиг Nginx нужно добваить&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-lua&#34; data-lang=&#34;lua&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;server&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;listen&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;443&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ssl&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;ssl_certificate&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;etc&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;letsencrypt&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;live&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;biotrapeza.ru&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fullchain.pem&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;ssl_certificate_key&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;etc&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;letsencrypt&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;live&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;biotrapeza.ru&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;privkey.pem&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;include&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;etc&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;letsencrypt&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;options&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ssl&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;-&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;nginx.conf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;...&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;server&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;listen&lt;/span&gt;  &lt;span class=&#34;mi&#34;&gt;80&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;server_name&lt;/span&gt;  &lt;span class=&#34;n&#34;&gt;plazan.ru&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;en.plazan&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ru&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;www.plazan&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ru&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;kr&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;301&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;https&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;//&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;$&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;host&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;$&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;request_uri&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&amp;ndash;&lt;/p&gt;
+&lt;p&gt;См ещё:
+&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-16-04&#34;
+&gt;https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-16-04&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://gist.github.com/valmat/1a1b29459a815cb85ea9dd0e0db9cf6c&#34;
+&gt;Источник&lt;/a&gt;&lt;/p&gt;
+
+            </content>    
+                                <category scheme="https://valmat.ru/tags/useful" term="useful" label="useful" />
+        </entry>
+        <entry>
+            <title>Proxy для Telegram</title>
+            <link href="https://valmat.ru/posts/archive/2018/04/proxy/" rel="alternate" type="text/html"  hreflang="en" />
+            <id>https://valmat.ru/posts/archive/2018/04/proxy/</id>
+            <published>2018-04-14T12:00:00+03:00</published>
+            <updated>2018-04-14T12:00:00+03:00</updated>
+            <content type="html">
+                &lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h1 id=&#34;в-связи-с-попытками-блокировок-telegram&#34;
+    &gt;
+        В связи с попытками блокировок Telegram
+    &lt;/h1&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/archive/2018/04/proxy/#в-связи-с-попытками-блокировок-telegram&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor В связи с попытками блокировок Telegram&#34; href=&#34;#%d0%b2-%d1%81%d0%b2%d1%8f%d0%b7%d0%b8-%d1%81-%d0%bf%d0%be%d0%bf%d1%8b%d1%82%d0%ba%d0%b0%d0%bc%d0%b8-%d0%b1%d0%bb%d0%be%d0%ba%d0%b8%d1%80%d0%be%d0%b2%d0%be%d0%ba-telegram&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Проверено на  5 баксовом тарифе DigitalOcean&lt;/p&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Создаём proxy пользователя для аутентификации по паролю:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;useradd -d /dev/null teleg
+passwd teleg
+&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Сразу же закрываем этому пользователю вход по SSH:
+(ещё лучше всегда менять ssh порт с дефолтного на кастомный)&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;nano /etc/ssh/sshd_config&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;#Port 22&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Port &lt;span class=&#34;m&#34;&gt;4251&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Match User teleg
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;PasswordAuthentication no
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Match all
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Рестартим ssh:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;/etc/init.d/ssh restart
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Проверяем:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;ssh -p4251 teleg@&amp;lt;ip&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Должно быть&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;Permission denied (publickey).
+&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;В репах Убунту старый и глючный &lt;code&gt;dante-server&lt;/code&gt;
+Поэтому берём свежий пакет&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; /tmp
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;wget http://ppa.launchpad.net/dajhorn/dante/ubuntu/pool/main/d/dante/dante-server_1.4.1-1_amd64.deb
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;dpkg -i dante-server_1.4.1-1_amd64.deb
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;rm dante-server_1.4.1-1_amd64.deb
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Редактируем настройки Данте-сервера:&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;cp /etc/danted.conf  /etc/danted~.conf
+nano /etc/danted.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Конфиг:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;logoutput: syslog /var/log/danted.log
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;user.privileged: root
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;user.unprivileged: teleg
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# The listening network interface or address.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;internal: 0.0.0.0 &lt;span class=&#34;nv&#34;&gt;port&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;1180&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# The proxying network interface or address.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;external: eth0
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# socks-rules determine what is proxied through the external interface.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# The default of &amp;#34;none&amp;#34; permits anonymous access.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;socksmethod: username
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# client-rules determine who can connect to the internal interface.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# The default of &amp;#34;none&amp;#34; permits anonymous access.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;clientmethod: none
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;client pass &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        from: 0.0.0.0/0 to: 0.0.0.0/0
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        log: connect disconnect error
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;socks pass &lt;span class=&#34;o&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        from: 0.0.0.0/0 to: 0.0.0.0/0
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        log: connect disconnect error
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;o&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Здесь
+&lt;code&gt;user.unprivileged: teleg&lt;/code&gt; &amp;ndash; имя пользователя, которого мы создали выше
+&lt;code&gt;port=1180&lt;/code&gt; мржете указать сами. Номер должен быть больше 1000&lt;/p&gt;
+&lt;p&gt;Сетевой интерфейс:
+&lt;code&gt;external: eth0&lt;/code&gt;
+Имя сетевого интерфейса может отличаться. Обычно eth0
+Что бы посмотреть имя используемого сетевого интерфейса нужно набрать&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;ifconfig
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Перезапускаем dante-server:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;/etc/init.d/danted stop
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;/etc/init.d/danted start
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Проверяем работает ли proxy:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;curl -v -x socks5://teleg:&amp;lt;psw&amp;gt;@&amp;lt;ip&amp;gt;:&amp;lt;port&amp;gt; http://ya.ru/
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;psw&gt;,&lt;ip&gt; и &lt;port&gt; нужно указать свои&lt;/p&gt;
+&lt;p&gt;Если всё нормально, то Ok
+Ссылка для включения прокси в телеграме:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;https://t.me/socks?server&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&amp;lt;ip&amp;gt;&lt;span class=&#34;p&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;port&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&amp;lt;port&amp;gt;&lt;span class=&#34;p&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;user&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;teleg&lt;span class=&#34;p&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;pass&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&amp;lt;psw&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Если что-то пошло не так, то смотрим логи:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;cat /var/log/danted.log
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;p&gt;Инструкцию эту собрал сам из разных источников. Лично мной проверена.&lt;/p&gt;
+&lt;p&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://gist.github.com/valmat/9b49ad02dac3941e47c442221ce852bb&#34;
+&gt;Источник&lt;/a&gt;&lt;/p&gt;
+
+            </content>    
+                                <category scheme="https://valmat.ru/tags/useful" term="useful" label="useful" />
+        </entry>
+</feed>

@@ -1,0 +1,1177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <generator uri="https://gohugo.io/" version="0.152.1">Hugo</generator>
+    <title>Llm on Valmat&#39;s Personal Blog</title>
+            <link href="https://valmat.ru/tags/LLM/" rel="alternate" type="text/html" title="html" />
+            <link href="https://valmat.ru/tags/LLM/feed.xml" rel="self" type="application/atom+xml" title="atom" />
+    <updated>2025-10-23T01:37:11+03:00</updated>
+    <id>https://valmat.ru/tags/LLM/</id>
+        <entry>
+            <title>Lost in the Middle. Перевод знаменитой статьи</title>
+            <link href="https://valmat.ru/posts/2025/08/lost-in-the-middle/" rel="alternate" type="text/html"  hreflang="en" />
+            <id>https://valmat.ru/posts/2025/08/lost-in-the-middle/</id>
+            <published>2025-08-30T22:38:23+03:00</published>
+            <updated>2025-08-30T22:38:23+03:00</updated>
+            <content type="html">
+                &lt;p&gt;Ниже представлен перевод знаменитой &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://arxiv.org/abs/2307.03172&#34;
+&gt;статьи Lost in the Middle&lt;/a&gt; о том, что номинальная длина контекстного окна &amp;ndash; это совсем не то же самое, что и эффективная.&lt;/p&gt;
+&lt;p&gt;Ссылки:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;Lost_in_the_Middle-2307.03172v3-en.pdf&#34;
+&gt;PDF оригинальной статьи&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;Lost_in_the_Middle-2307.03172v3-ru.pdf&#34;
+&gt;PDF перевода статьи&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Источник: &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://arxiv.org/abs/2307.03172&#34;
+&gt;https://arxiv.org/abs/2307.03172&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h1 id=&#34;потерянные-в-середине-как-языковые-модели-используют-длинные-контексты&#34;
+    &gt;
+        Потерянные в середине: как языковые модели используют длинные контексты
+    &lt;/h1&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2025/08/lost-in-the-middle/#потерянные-в-середине-как-языковые-модели-используют-длинные-контексты&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Потерянные в середине: как языковые модели используют длинные контексты&#34; href=&#34;#%d0%bf%d0%be%d1%82%d0%b5%d1%80%d1%8f%d0%bd%d0%bd%d1%8b%d0%b5-%d0%b2-%d1%81%d0%b5%d1%80%d0%b5%d0%b4%d0%b8%d0%bd%d0%b5-%d0%ba%d0%b0%d0%ba-%d1%8f%d0%b7%d1%8b%d0%ba%d0%be%d0%b2%d1%8b%d0%b5-%d0%bc%d0%be%d0%b4%d0%b5%d0%bb%d0%b8-%d0%b8%d1%81%d0%bf%d0%be%d0%bb%d1%8c%d0%b7%d1%83%d1%8e%d1%82-%d0%b4%d0%bb%d0%b8%d0%bd%d0%bd%d1%8b%d0%b5-%d0%ba%d0%be%d0%bd%d1%82%d0%b5%d0%ba%d1%81%d1%82%d1%8b&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;em&gt;Lost in the Middle: How Language Models Use Long Contexts&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Авторы:&lt;/strong&gt;&lt;br&gt;
+Nelson F. Liu*, Kevin Lin, John Hewitt, Ashwin Paranjape, Michele Bevilacqua, Fabio Petroni, Percy Liang&lt;br&gt;
+*Работа частично выполнена в качестве стажёра в Samaya AI.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;аннотация&#34;
+    &gt;
+        Аннотация
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2025/08/lost-in-the-middle/#аннотация&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Аннотация&#34; href=&#34;#%d0%b0%d0%bd%d0%bd%d0%be%d1%82%d0%b0%d1%86%d0%b8%d1%8f&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Хотя современные языковые модели могут принимать длинные контексты в качестве входных данных, относительно мало известно о том, насколько хорошо они &lt;em&gt;используют&lt;/em&gt; более длинные контексты.&lt;br&gt;
+Мы анализируем производительность языковых моделей в двух задачах, требующих идентификации релевантной информации в их входных контекстах: многодокументный вопросно-ответный анализ и извлечение ключевых значений.&lt;br&gt;
+Мы обнаруживаем, что производительность может значительно ухудшаться при изменении позиции релевантной информации, что указывает на то, что текущие языковые модели не могут надежно использовать информацию в длинных входных контекстах.&lt;br&gt;
+В частности, мы наблюдаем, что производительность часто максимальна, когда релевантная информация находится в начале или в конце входного контекста, и значительно ухудшается, когда модели должны получать доступ к релевантной информации в середине длинных контекстов, даже для моделей с явно длинным контекстом.&lt;br&gt;
+Наш анализ дает лучшее понимание того, как языковые модели используют свой входной контекст, и предлагает новые протоколы оценки для будущих моделей с длинным контекстом.&lt;/p&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;введение&#34;
+    &gt;
+        Введение
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2025/08/lost-in-the-middle/#введение&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Введение&#34; href=&#34;#%d0%b2%d0%b2%d0%b5%d0%b4%d0%b5%d0%bd%d0%b8%d0%b5&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;img
+  src=&#34;figures/figure1.png&#34;
+  alt=&#34;U-образная кривая производительности&#34;
+  
+/&gt;
+&lt;em&gt;Изменение местоположения релевантной информации (позиции отрывка, который отвечает на входной вопрос) в контексте входных данных языковой модели приводит к U-образной кривой производительности — модели лучше используют релевантную информацию, которая находится в самом начале (эффект первичности) или в конце её входного контекста (эффект недавности), а производительность значительно ухудшается, когда модели должны получать доступ и использовать информацию, расположенную в середине её входного контекста.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Языковые модели стали важным и гибким строительным блоком в различных языковых технологиях, ориентированных на пользователя, включая разговорные интерфейсы, поиск и суммаризацию, а также совместное написание [Shuster et al., 2022; Thoppilan et al., 2022; Lee et al., 2022].&lt;br&gt;
+Эти модели выполняют задачи нижнего уровня в основном через подсказки: вся релевантная спецификация задачи и данные для обработки форматируются как текстовый входной контекст, и модель возвращает сгенерированное текстовое завершение.&lt;br&gt;
+Эти входные контексты могут содержать тысячи токенов, особенно когда языковые модели используются для обработки длинных документов (например, юридических или научных документов, истории разговоров и т. д.) или когда языковые модели дополняются внешней информацией (например, релевантными документами из поисковой системы, результатами запросов к базе данных и т. д.; [Petroni et al., 2020; Ram et al., 2023; Shi et al., 2023; Mallen et al., 2023; Schick et al., 2023]).&lt;/p&gt;
+&lt;p&gt;Обработка этих случаев использования требует, чтобы языковые модели успешно работали с длинными последовательностями.&lt;br&gt;
+Существующие языковые модели обычно реализуются с помощью трансформеров [Vaswani et al., 2017], которые требуют памяти и вычислений, увеличивающихся квадратично в зависимости от длины последовательности.&lt;br&gt;
+В результате трансформерные языковые модели часто обучались с относительно небольшими оконными контекстами (от 512 до 2048 токенов).&lt;br&gt;
+Недавние улучшения в аппаратном обеспечении (например, более быстрые графические процессоры с большим объемом памяти) и алгоритмах [Dai et al., 2019; Dao et al., 2022; Poli et al., 2023; Rubin et al., 2023] привели к появлению языковых моделей с большими оконными контекстами (например, 4096, 32K и даже 100K токенов), но остается неясным, как эти модели с расширенным контекстом используют свои входные контексты при выполнении задач нижнего уровня.&lt;/p&gt;
+&lt;p&gt;Мы эмпирически исследуем этот вопрос с помощью контролируемых экспериментов с различными современными открытыми (MPT-30B-Instruct, LongChat-13B (16K)) и закрытыми (OpenAI&amp;rsquo;s GPT-3.5-Turbo и Anthropic&amp;rsquo;s Claude-1.3) языковыми моделями в условиях, требующих доступа и использования информации в пределах входного контекста.&lt;br&gt;
+В частности, в наших экспериментах вносятся контролируемые изменения в размер входного контекста и положение релевантной информации в пределах входного контекста, и изучаются их эффекты на производительность языковой модели.&lt;br&gt;
+Если языковые модели могут надежно использовать информацию в пределах длинных входных контекстов, то их производительность должна быть &lt;em&gt;минимально подвержена&lt;/em&gt; влиянию положения релевантной информации в контексте входных данных.&lt;/p&gt;
+&lt;p&gt;Сначала мы экспериментируем с многодокументным вопросно-ответным анализом, который требует от моделей анализа предоставленных документов для нахождения релевантной информации и использования её для ответа на заданный вопрос; эта задача имитирует настройку генерации с дополнением поиска, лежащую в основе многих коммерческих приложений генеративного поиска и вопросно-ответного анализа (например, Bing Chat).&lt;br&gt;
+В этом контексте мы контролируем (i)~длину входного контекста, изменяя количество документов в контексте входных данных (аналогично извлечению большего или меньшего количества документов в генерации с дополнением поиска), и (ii)~контролируем положение релевантной информации в пределах входного контекста, изменяя порядок документов, чтобы разместить релевантный документ в начале, середине или конце контекста.&lt;/p&gt;
+&lt;p&gt;Мы обнаруживаем, что изменение положения релевантной информации в контексте входных данных может существенно повлиять на производительность модели, что указывает на то, что текущие языковые модели не могут надежно получать доступ и использовать информацию в длинных входных контекстах.&lt;br&gt;
+Более того, мы наблюдаем характерную U-образную кривую производительности (см. рисунок выше); производительность языковой модели наивысшая, когда релевантная информация находится в самом начале (эффект первичности) или в конце её входного контекста (эффект недавности), и производительность значительно ухудшается, когда модели должны получать доступ и использовать информацию в середине своих входных контекстов (§ QA Results).&lt;br&gt;
+Например, когда релевантная информация размещена в середине её входного контекста, производительность GPT-3.5-Turbo на задаче многодокументного вопросно-ответного анализа ниже, чем её производительность при прогнозировании &lt;em&gt;без каких-либо документов&lt;/em&gt; (т.е. в закрытой книге; 56.1%).&lt;br&gt;
+Кроме того, мы обнаруживаем, что модели часто имеют идентичную производительность с их аналогами с расширенным контекстом, что указывает на то, что модели с расширенным контекстом не обязательно лучше используют свой входной контекст (§ QA Results).&lt;/p&gt;
+&lt;p&gt;Учитывая, что языковые модели испытывают трудности с извлечением и использованием релевантной информации в задаче многодокументного вопросно-ответного анализа, в какой степени языковые модели вообще могут &lt;em&gt;извлекать&lt;/em&gt; из своих входных контекстов?&lt;br&gt;
+Мы изучаем этот вопрос с помощью синтетической задачи извлечения ключевых значений, которая предназначена для минимального тестирования базовой способности извлекать совпадающие токены из входного контекста.&lt;br&gt;
+В этой задаче моделям предоставляется коллекция пар ключ-значение в формате JSON, и они должны вернуть значение, связанное с определенным ключом.&lt;br&gt;
+Подобно задаче многодокументного вопросно-ответного анализа, задача извлечения ключевых значений допускает контролируемые изменения длины входного контекста (добавление большего количества пар ключ-значение) и положения релевантной информации.&lt;br&gt;
+Хотя некоторые модели выполняют синтетическую задачу извлечения ключевых значений идеально, другие модели испытывают трудности даже с простым извлечением совпадающих токенов, которые встречаются в середине их входного контекста, и продолжают демонстрировать U-образную кривую производительности.&lt;/p&gt;
+&lt;p&gt;Чтобы лучше понять, почему языковые модели испытывают трудности с надежным доступом и использованием информации в своих входных контекстах, мы изучаем роль архитектуры модели (только декодер против кодер-декодер), контекстуализации с учетом запроса и тонкой настройки инструкций (§ Why U-shape). Мы обнаруживаем, что:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Кодер-декодер модели относительно устойчивы к изменениям положения релевантной информации в их входном контексте, но только при оценке последовательностей в пределах их максимальной длины последовательности на этапе обучения. При оценке последовательностей, превышающих те, что были видны во время обучения, мы наблюдаем U-образную кривую производительности (§ Architecture).&lt;/li&gt;
+&lt;li&gt;Контекстуализация с учетом запроса (размещение запроса перед &lt;em&gt;и&lt;/em&gt; после документов или пар ключ-значение) обеспечивает почти идеальную производительность в синтетической задаче извлечения ключевых значений, но минимально изменяет тенденции в многодокументном вопросно-ответном анализе (§ Pre-conditioning).&lt;/li&gt;
+&lt;li&gt;Даже базовые языковые модели (т.е. без тонкой настройки инструкций) демонстрируют U-образную кривую производительности при изменении положения релевантной информации в контексте входных данных.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Наши результаты показывают, что предоставление языковым моделям более длинных входных контекстов — это компромисс: предоставление языковой модели большего объема информации может помочь ей выполнить задачу нижнего уровня, но также увеличивает объем контента, который модель должна анализировать, что может снизить точность.&lt;br&gt;
+Чтобы лучше понять этот компромисс на практике, мы проводим тематическое исследование с моделями извлечения-читателя на открытом вопросно-ответном анализе (§ ODQA Case Study).&lt;br&gt;
+В отличие от нашей контролируемой задачи многодокументного вопросно-ответного анализа, где контекст всегда содержит ровно &lt;em&gt;один&lt;/em&gt; документ, который отвечает на вопрос, ни один или многие из топ $k$ документов могут не содержать ответа в настройке открытого вопросно-ответного анализа.&lt;br&gt;
+Когда мы извлекаем из Википедии, чтобы ответить на запросы из NaturalQuestions-Open, мы обнаруживаем, что производительность модели насыщается задолго до насыщения извлечения, что указывает на то, что текущие модели не могут эффективно использовать дополнительные извлеченные документы — использование 50 документов вместо 20 извлеченных документов лишь незначительно улучшает производительность ($\sim$1.5% для GPT-3.5-Turbo и $\sim$1% для Claude-1.3).&lt;/p&gt;
+&lt;p&gt;Наш анализ дает лучшее понимание того, как языковые модели используют свой входной контекст, и вводит новые протоколы оценки для будущих моделей с длинным контекстом; чтобы утверждать, что языковая модель может надежно использовать информацию в пределах длинных входных контекстов, необходимо показать, что её производительность минимально подвержена влиянию положения релевантной информации в контексте входных данных (например, минимальная разница в наилучшей и наихудшей производительности).&lt;br&gt;
+Чтобы способствовать дальнейшей работе по пониманию и улучшению того, как языковые модели используют свой входной контекст, мы выпускаем наш код и данные оценки.&lt;br&gt;
+&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://nelsonliu.me/papers/lost-in-the-middle&#34;
+&gt;https://nelsonliu.me/papers/lost-in-the-middle&lt;/a&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;многодокументный-вопросно-ответный-анализ&#34;
+    &gt;
+        Многодокументный вопросно-ответный анализ
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2025/08/lost-in-the-middle/#многодокументный-вопросно-ответный-анализ&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Многодокументный вопросно-ответный анализ&#34; href=&#34;#%d0%bc%d0%bd%d0%be%d0%b3%d0%be%d0%b4%d0%be%d0%ba%d1%83%d0%bc%d0%b5%d0%bd%d1%82%d0%bd%d1%8b%d0%b9-%d0%b2%d0%be%d0%bf%d1%80%d0%be%d1%81%d0%bd%d0%be-%d0%be%d1%82%d0%b2%d0%b5%d1%82%d0%bd%d1%8b%d0%b9-%d0%b0%d0%bd%d0%b0%d0%bb%d0%b8%d0%b7&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;экспериментальная-установка&#34;
+    &gt;
+        Экспериментальная установка
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2025/08/lost-in-the-middle/#экспериментальная-установка&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Экспериментальная установка&#34; href=&#34;#%d1%8d%d0%ba%d1%81%d0%bf%d0%b5%d1%80%d0%b8%d0%bc%d0%b5%d0%bd%d1%82%d0%b0%d0%bb%d1%8c%d0%bd%d0%b0%d1%8f-%d1%83%d1%81%d1%82%d0%b0%d0%bd%d0%be%d0%b2%d0%ba%d0%b0&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;В задаче многодокументного вопросно-ответного анализа входные данные модели включают (i)&lt;del&gt;вопрос, на который нужно ответить, и (ii)&lt;/del&gt;$k$ документов (например, отрывки из Википедии), где &lt;em&gt;ровно один&lt;/em&gt; из документов содержит ответ на вопрос, а $k - 1$ «отвлекающих» документов не содержат.&lt;br&gt;
+Эта задача требует от модели доступа к документу, содержащему ответ, в пределах её входного контекста и использования его для ответа на вопрос.&lt;/p&gt;
+&lt;!-- ![Пример задачи многодокументного вопросно-ответного анализа](figures/qa_example.png) --&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;пример-задачи-многодокументного-вопросно-ответного-анализа&#34;
+    &gt;
+        Пример задачи многодокументного вопросно-ответного анализа
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2025/08/lost-in-the-middle/#пример-задачи-многодокументного-вопросно-ответного-анализа&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Пример задачи многодокументного вопросно-ответного анализа&#34; href=&#34;#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%80-%d0%b7%d0%b0%d0%b4%d0%b0%d1%87%d0%b8-%d0%bc%d0%bd%d0%be%d0%b3%d0%be%d0%b4%d0%be%d0%ba%d1%83%d0%bc%d0%b5%d0%bd%d1%82%d0%bd%d0%be%d0%b3%d0%be-%d0%b2%d0%be%d0%bf%d1%80%d0%be%d1%81%d0%bd%d0%be-%d0%be%d1%82%d0%b2%d0%b5%d1%82%d0%bd%d0%be%d0%b3%d0%be-%d0%b0%d0%bd%d0%b0%d0%bb%d0%b8%d0%b7%d0%b0&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;Input Context&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Write a high-quality answer for the given question using only the provided search results (some of which might be irrelevant).&lt;/p&gt;
+&lt;p&gt;Document [1](Title: Asian Americans in science and technology) Prize in physics for discovery of the subatomic particle J/ψ. Subrahmanyan Chandrasekhar shared&amp;hellip;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Document [2](Title: List of Nobel laureates in Physics) The first Nobel Prize in Physics was awarded in 1901 to Wilhelm Conrad Röntgen, of Germany, who received&amp;hellip;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Document [3](Title: Scientist) and pursued through a unique method, was essentially in place. Ramón y Cajal won the Nobel Prize in 1906 for his remarkable&amp;hellip;&lt;/p&gt;
+&lt;p&gt;Question: who got the first nobel prize in physics &lt;br&gt;
+Answer:&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Desired Answer&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Wilhelm Conrad Röntgen&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;em&gt;Документ, содержащий ответ, выделен для ясности.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Мы реализуем эту задачу с данными из NaturalQuestions-Open [Lee et al., 2019; Kwiatkowski et al., 2019], которые содержат исторические запросы, отправленные в поисковую систему Google, в сочетании с аннотированными людьми ответами, извлеченными из Википедии.&lt;br&gt;
+В частности, мы берем 2655 запросов, где аннотированный длинный ответ является абзацем (в отличие от списка или таблицы).&lt;br&gt;
+Мы используем отрывки (кусочки не более 100 токенов) из Википедии в качестве документов в пределах наших входных контекстов.&lt;br&gt;
+Для каждого из запросов нам нужен документ, содержащий ответ, и $k-1$ отвлекающих документов, которые не содержат ответа.&lt;br&gt;
+Чтобы получить документ, который отвечает на вопрос, мы используем абзац Википедии, содержащий ответ из аннотаций NaturalQuestions.&lt;/p&gt;
+&lt;p&gt;Чтобы собрать $k-1$ отвлекающих документов, которые не содержат ответа, мы используем систему извлечения (Contriever, дообученную на MS-MARCO; [Izacard et al., 2021]) для извлечения $k-1$ отрывков из Википедии, которые наиболее релевантны запросу и не содержат ни одного из аннотированных ответов NaturalQuestions.&lt;/p&gt;
+&lt;p&gt;Чтобы модулировать положение релевантной информации в пределах входного контекста, мы изменяем порядок документов, чтобы изменить положение документа, содержащего ответ.&lt;/p&gt;
+&lt;!-- ![Модуляция положения релевантной информации](figures/qa_changing_position.png) --&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;модуляция-положения-релевантной-информации&#34;
+    &gt;
+        Модуляция положения релевантной информации
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2025/08/lost-in-the-middle/#модуляция-положения-релевантной-информации&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Модуляция положения релевантной информации&#34; href=&#34;#%d0%bc%d0%be%d0%b4%d1%83%d0%bb%d1%8f%d1%86%d0%b8%d1%8f-%d0%bf%d0%be%d0%bb%d0%be%d0%b6%d0%b5%d0%bd%d0%b8%d1%8f-%d1%80%d0%b5%d0%bb%d0%b5%d0%b2%d0%b0%d0%bd%d1%82%d0%bd%d0%be%d0%b9-%d0%b8%d0%bd%d1%84%d0%be%d1%80%d0%bc%d0%b0%d1%86%d0%b8%d0%b8&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;Input Context&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Write a high-quality answer for the given question using only the provided search results (some of which might be irrelevant).&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Document [1](Title: List of Nobel laureates in Physics) &amp;hellip;&lt;/strong&gt; &lt;br&gt;
+Document [2](Title: Asian Americans in science and technology) &amp;hellip; &lt;br&gt;
+Document [3](Title: Scientist) &amp;hellip;&lt;/p&gt;
+&lt;p&gt;Question: who got the first nobel prize in physics &lt;br&gt;
+Answer:&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Desired Answer&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Wilhelm Conrad Röntgen&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Чтобы модулировать длину входного контекста в этой задаче, мы увеличиваем или уменьшаем количество извлеченных документов, не содержащих ответа.&lt;/p&gt;
+&lt;!-- ![Модуляция длины входного контекста](figures/qa_changing_length.png) --&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;модуляция-длины-входного-контекста&#34;
+    &gt;
+        Модуляция длины входного контекста
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2025/08/lost-in-the-middle/#модуляция-длины-входного-контекста&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Модуляция длины входного контекста&#34; href=&#34;#%d0%bc%d0%be%d0%b4%d1%83%d0%bb%d1%8f%d1%86%d0%b8%d1%8f-%d0%b4%d0%bb%d0%b8%d0%bd%d1%8b-%d0%b2%d1%85%d0%be%d0%b4%d0%bd%d0%be%d0%b3%d0%be-%d0%ba%d0%be%d0%bd%d1%82%d0%b5%d0%ba%d1%81%d1%82%d0%b0&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;Input Context&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Write a high-quality answer for the given question using only the provided search results (some of which might be irrelevant).&lt;/p&gt;
+&lt;p&gt;Document [1](Title: Asian Americans in science and technology) &amp;hellip; &lt;br&gt;
+&lt;strong&gt;Document [2](Title: List of Nobel laureates in Physics) &amp;hellip;&lt;/strong&gt; &lt;br&gt;
+Document [3](Title: Scientist) &amp;hellip; &lt;br&gt;
+Document [4](Title: Norwegian Americans) &amp;hellip; &lt;br&gt;
+Document [5](Title: Maria Goeppert Mayer) &amp;hellip;&lt;/p&gt;
+&lt;p&gt;Question: who got the first nobel prize in physics &lt;br&gt;
+Answer:&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Desired Answer&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Wilhelm Conrad Röntgen&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Следуя [Kandpal et al., 2022; Mallen et al., 2023], мы используем точность в качестве нашего основного показателя оценки, оценивая, появляется ли какой-либо из правильных ответов (как взято из аннотаций NaturalQuestions) в предсказанном выводе.&lt;/p&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;модели&#34;
+    &gt;
+        Модели
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2025/08/lost-in-the-middle/#модели&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Модели&#34; href=&#34;#%d0%bc%d0%be%d0%b4%d0%b5%d0%bb%d0%b8&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Мы анализируем несколько современных открытых и закрытых языковых моделей.&lt;br&gt;
+Мы используем жадное декодирование при генерации выводов и оставляем изучение других методов декодирования для будущей работы.&lt;br&gt;
+Мы используем стандартный набор подсказок для каждой модели.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Открытые модели:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;MPT-30B-Instruct (максимальная длина контекста 8192 токена, ALiBi позиционирование)&lt;/li&gt;
+&lt;li&gt;LongChat-13B (16K) (расширенное окно контекста LLaMA-13B до 16384 токенов)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Закрытые модели:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;GPT-3.5-Turbo (4K токенов) и GPT-3.5-Turbo (16K)&lt;/li&gt;
+&lt;li&gt;Claude-1.3 (8K токенов) и Claude-1.3 (100K токенов)&lt;/li&gt;
+&lt;li&gt;GPT-4 (8K) — только подмножество экспериментов&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;результаты-и-обсуждение&#34;
+    &gt;
+        Результаты и обсуждение
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2025/08/lost-in-the-middle/#результаты-и-обсуждение&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Результаты и обсуждение&#34; href=&#34;#%d1%80%d0%b5%d0%b7%d1%83%d0%bb%d1%8c%d1%82%d0%b0%d1%82%d1%8b-%d0%b8-%d0%be%d0%b1%d1%81%d1%83%d0%b6%d0%b4%d0%b5%d0%bd%d0%b8%d0%b5&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Мы экспериментируем с входными контекстами, содержащими 10, 20 и 30 документов.&lt;br&gt;
+Ниже — производительность многодокументного вопросно-ответного анализа при изменении положения релевантной информации в пределах входного контекста.&lt;/p&gt;
+&lt;p&gt;&lt;img
+  src=&#34;figures/qa.png&#34;
+  alt=&#34;Влияние положения релевантной информации&#34;
+  
+/&gt;&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;таблица-точность-языковых-моделей-в-закрытой-книге-и-оракульской-настройке&#34;
+    &gt;
+        Таблица: Точность языковых моделей в закрытой книге и оракульской настройке
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2025/08/lost-in-the-middle/#таблица-точность-языковых-моделей-в-закрытой-книге-и-оракульской-настройке&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Таблица: Точность языковых моделей в закрытой книге и оракульской настройке&#34; href=&#34;#%d1%82%d0%b0%d0%b1%d0%bb%d0%b8%d1%86%d0%b0-%d1%82%d0%be%d1%87%d0%bd%d0%be%d1%81%d1%82%d1%8c-%d1%8f%d0%b7%d1%8b%d0%ba%d0%be%d0%b2%d1%8b%d1%85-%d0%bc%d0%be%d0%b4%d0%b5%d0%bb%d0%b5%d0%b9-%d0%b2-%d0%b7%d0%b0%d0%ba%d1%80%d1%8b%d1%82%d0%be%d0%b9-%d0%ba%d0%bd%d0%b8%d0%b3%d0%b5-%d0%b8-%d0%be%d1%80%d0%b0%d0%ba%d1%83%d0%bb%d1%8c%d1%81%d0%ba%d0%be%d0%b9-%d0%bd%d0%b0%d1%81%d1%82%d1%80%d0%be%d0%b9%d0%ba%d0%b5&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;Модель&lt;/th&gt;
+          &lt;th style=&#34;text-align: center&#34;&gt;Закрытая книга&lt;/th&gt;
+          &lt;th style=&#34;text-align: center&#34;&gt;Оракул&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;LongChat-13B (16K)&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;35.0%&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;83.4%&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;MPT-30B-Instruct&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;31.5%&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;81.9%&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;GPT-3.5-Turbo&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;56.1%&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;88.3%&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;GPT-3.5-Turbo (16K)&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;56.0%&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;88.6%&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Claude-1.3&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;48.3%&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;76.1%&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Claude-1.3 (100K)&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;48.2%&lt;/td&gt;
+          &lt;td style=&#34;text-align: center&#34;&gt;76.4%&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;основные-выводы&#34;
+    &gt;
+        Основные выводы
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2025/08/lost-in-the-middle/#основные-выводы&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Основные выводы&#34; href=&#34;#%d0%be%d1%81%d0%bd%d0%be%d0%b2%d0%bd%d1%8b%d0%b5-%d0%b2%d1%8b%d0%b2%d0%be%d0%b4%d1%8b&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Производительность максимальна, когда релевантная информация в начале или конце контекста.&lt;/strong&gt;&lt;br&gt;
+U-образная кривая производительности: модели лучше используют релевантную информацию, находящуюся в начале (эффект первичности) или в конце (эффект недавности) контекста, и производительность значительно ухудшается, когда информация в середине.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Модели с расширенным контекстом не обязательно лучше используют входной контекст.&lt;/strong&gt;&lt;br&gt;
+Производительность между обычной и расширенной версией модели почти идентична, если входной контекст помещается в их окно.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;насколько-хорошо-языковые-модели-могут-извлекать-из-входных-контекстов&#34;
+    &gt;
+        Насколько хорошо языковые модели могут извлекать из входных контекстов?
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2025/08/lost-in-the-middle/#насколько-хорошо-языковые-модели-могут-извлекать-из-входных-контекстов&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Насколько хорошо языковые модели могут извлекать из входных контекстов?&#34; href=&#34;#%d0%bd%d0%b0%d1%81%d0%ba%d0%be%d0%bb%d1%8c%d0%ba%d0%be-%d1%85%d0%be%d1%80%d0%be%d1%88%d0%be-%d1%8f%d0%b7%d1%8b%d0%ba%d0%be%d0%b2%d1%8b%d0%b5-%d0%bc%d0%be%d0%b4%d0%b5%d0%bb%d0%b8-%d0%bc%d0%be%d0%b3%d1%83%d1%82-%d0%b8%d0%b7%d0%b2%d0%bb%d0%b5%d0%ba%d0%b0%d1%82%d1%8c-%d0%b8%d0%b7-%d0%b2%d1%85%d0%be%d0%b4%d0%bd%d1%8b%d1%85-%d0%ba%d0%be%d0%bd%d1%82%d0%b5%d0%ba%d1%81%d1%82%d0%be%d0%b2&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Учитывая, что языковые модели испытывают трудности с извлечением и использованием информации из середины их входных контекстов в задаче многодокументного вопросно-ответного анализа, в какой степени они могут просто &lt;em&gt;извлекать&lt;/em&gt; из входных контекстов?&lt;br&gt;
+Мы изучаем этот вопрос с помощью синтетической задачи извлечения ключевых значений.&lt;/p&gt;
+&lt;!-- ![Пример задачи извлечения ключевых значений](figures/kv_retrieval_example.png) --&gt;
+&lt;p&gt;&lt;strong&gt;Input Context&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Extract the value corresponding to the specified key in the JSON object below.&lt;/p&gt;
+&lt;p&gt;JSON data:&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;&amp;#34;2a8d601d-1d69-4e64-9f90-8ad825a74195&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;bb3ba2a5-7de8-434b-a86e-a88bb9fa7289&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; &lt;span class=&#34;nt&#34;&gt;&amp;#34;a54e2eed-e625-4570-9f74-3624e77d6684&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;d1ff29be-4e2a-4208-a182-0cea716be3d4&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; &lt;span class=&#34;nt&#34;&gt;&amp;#34;9f4a92b9-5f69-4725-ba1e-403f08dea695&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;703a7ce5-f17f-4e6d-b895-5836ba5ec71c&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;c1&#34;&gt;// &amp;lt;--
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt; &lt;span class=&#34;nt&#34;&gt;&amp;#34;52a9c80c-da51-4fc9-bf70-4a4901bc2ac3&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;b2f8ea3d-4b1b-49e0-a141-b9823991ebeb&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; &lt;span class=&#34;nt&#34;&gt;&amp;#34;f4eb1c53-af0a-4dc4-a3a5-c2d50851a178&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;d733b0d2-6af3-44e1-8592-e5637fdb76fb&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;blockquote&gt;
+&lt;p&gt;Key: &amp;ldquo;&lt;strong&gt;9f4a92b9-5f69-4725-ba1e-403f08dea695&lt;/strong&gt;&amp;rdquo;
+Corresponding value:&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Desired Output&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;703a7ce5-f17f-4e6d-b895-5836ba5ec71c&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;экспериментальная-установка-1&#34;
+    &gt;
+        Экспериментальная установка
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2025/08/lost-in-the-middle/#экспериментальная-установка-1&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Экспериментальная установка&#34; href=&#34;#%d1%8d%d0%ba%d1%81%d0%bf%d0%b5%d1%80%d0%b8%d0%bc%d0%b5%d0%bd%d1%82%d0%b0%d0%bb%d1%8c%d0%bd%d0%b0%d1%8f-%d1%83%d1%81%d1%82%d0%b0%d0%bd%d0%be%d0%b2%d0%ba%d0%b0-1&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Входные данные включают:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;сериализованный объект JSON с $k$ парами ключ-значение (UUID)&lt;/li&gt;
+&lt;li&gt;ключ, для которого нужно вернуть значение&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Мы измеряем точность, оценивая, появляется ли правильное значение в предсказанном выводе.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;результаты&#34;
+    &gt;
+        Результаты
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2025/08/lost-in-the-middle/#результаты&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Результаты&#34; href=&#34;#%d1%80%d0%b5%d0%b7%d1%83%d0%bb%d1%8c%d1%82%d0%b0%d1%82%d1%8b&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;img
+  src=&#34;figures/kv_records.png&#34;
+  alt=&#34;Влияние длины и положения релевантной информации&#34;
+  
+/&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Claude-1.3 и Claude-1.3 (100K) почти идеально выполняют задачу на всех длинах контекста.&lt;/li&gt;
+&lt;li&gt;GPT-3.5-Turbo, GPT-3.5-Turbo (16K) и MPT-30B-Instruct испытывают трудности, особенно при большом количестве пар.&lt;/li&gt;
+&lt;li&gt;U-образная кривая производительности сохраняется: наименьшая точность — при необходимости извлекать из середины контекста.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;почему-языковые-модели-не-устойчивы-к-изменениям-положения-релевантной-информации&#34;
+    &gt;
+        Почему языковые модели не устойчивы к изменениям положения релевантной информации?
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2025/08/lost-in-the-middle/#почему-языковые-модели-не-устойчивы-к-изменениям-положения-релевантной-информации&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Почему языковые модели не устойчивы к изменениям положения релевантной информации?&#34; href=&#34;#%d0%bf%d0%be%d1%87%d0%b5%d0%bc%d1%83-%d1%8f%d0%b7%d1%8b%d0%ba%d0%be%d0%b2%d1%8b%d0%b5-%d0%bc%d0%be%d0%b4%d0%b5%d0%bb%d0%b8-%d0%bd%d0%b5-%d1%83%d1%81%d1%82%d0%be%d0%b9%d1%87%d0%b8%d0%b2%d1%8b-%d0%ba-%d0%b8%d0%b7%d0%bc%d0%b5%d0%bd%d0%b5%d0%bd%d0%b8%d1%8f%d0%bc-%d0%bf%d0%be%d0%bb%d0%be%d0%b6%d0%b5%d0%bd%d0%b8%d1%8f-%d1%80%d0%b5%d0%bb%d0%b5%d0%b2%d0%b0%d0%bd%d1%82%d0%bd%d0%be%d0%b9-%d0%b8%d0%bd%d1%84%d0%be%d1%80%d0%bc%d0%b0%d1%86%d0%b8%d0%b8&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Мы исследуем роль архитектуры модели, контекстуализации с учетом запроса и тонкой настройки инструкций.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;влияние-архитектуры-модели&#34;
+    &gt;
+        Влияние архитектуры модели
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2025/08/lost-in-the-middle/#влияние-архитектуры-модели&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Влияние архитектуры модели&#34; href=&#34;#%d0%b2%d0%bb%d0%b8%d1%8f%d0%bd%d0%b8%d0%b5-%d0%b0%d1%80%d1%85%d0%b8%d1%82%d0%b5%d0%ba%d1%82%d1%83%d1%80%d1%8b-%d0%bc%d0%be%d0%b4%d0%b5%d0%bb%d0%b8&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;img
+  src=&#34;figures/qa_decoder_only_vs_encoder_decoder.png&#34;
+  alt=&#34;Сравнение моделей только-декодера и кодер-декодер&#34;
+  
+/&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Кодер-декодер модели (Flan-UL2, Flan-T5-XXL) устойчивы к изменению позиции релевантной информации, если длина последовательности не превышает ту, что была на обучении.&lt;/li&gt;
+&lt;li&gt;При более длинных последовательностях появляется U-образная кривая.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;влияние-контекстуализации-с-учетом-запроса&#34;
+    &gt;
+        Влияние контекстуализации с учетом запроса
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2025/08/lost-in-the-middle/#влияние-контекстуализации-с-учетом-запроса&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Влияние контекстуализации с учетом запроса&#34; href=&#34;#%d0%b2%d0%bb%d0%b8%d1%8f%d0%bd%d0%b8%d0%b5-%d0%ba%d0%be%d0%bd%d1%82%d0%b5%d0%ba%d1%81%d1%82%d1%83%d0%b0%d0%bb%d0%b8%d0%b7%d0%b0%d1%86%d0%b8%d0%b8-%d1%81-%d1%83%d1%87%d0%b5%d1%82%d0%be%d0%bc-%d0%b7%d0%b0%d0%bf%d1%80%d0%be%d1%81%d0%b0&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;img
+  src=&#34;figures/20_total_documents_precondition_with_question.jpg&#34;
+  alt=&#34;Контекстуализация с учетом запроса&#34;
+  
+/&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Размещение запроса перед &lt;em&gt;и&lt;/em&gt; после данных почти не влияет на тенденции в многодокументном вопросно-ответном анализе, но помогает в синтетической задаче извлечения ключевых значений.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;влияние-тонкой-настройки-инструкций&#34;
+    &gt;
+        Влияние тонкой настройки инструкций
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2025/08/lost-in-the-middle/#влияние-тонкой-настройки-инструкций&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Влияние тонкой настройки инструкций&#34; href=&#34;#%d0%b2%d0%bb%d0%b8%d1%8f%d0%bd%d0%b8%d0%b5-%d1%82%d0%be%d0%bd%d0%ba%d0%be%d0%b9-%d0%bd%d0%b0%d1%81%d1%82%d1%80%d0%be%d0%b9%d0%ba%d0%b8-%d0%b8%d0%bd%d1%81%d1%82%d1%80%d1%83%d0%ba%d1%86%d0%b8%d0%b9&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;img
+  src=&#34;figures/base_vs_instruction_tuned.jpg&#34;
+  alt=&#34;Базовая модель vs. после тонкой настройки инструкций&#34;
+  
+/&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;U-образная кривая наблюдается как у базовой модели, так и у модели после тонкой настройки инструкций.&lt;/li&gt;
+&lt;li&gt;Тонкая настройка инструкций слегка уменьшает разницу между наилучшей и наихудшей производительностью.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;всегда-ли-больше-контекста-лучше-тематическое-исследование-с-открытым-вопросно-ответным-анализом&#34;
+    &gt;
+        Всегда ли больше контекста лучше? Тематическое исследование с открытым вопросно-ответным анализом
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2025/08/lost-in-the-middle/#всегда-ли-больше-контекста-лучше-тематическое-исследование-с-открытым-вопросно-ответным-анализом&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Всегда ли больше контекста лучше? Тематическое исследование с открытым вопросно-ответным анализом&#34; href=&#34;#%d0%b2%d1%81%d0%b5%d0%b3%d0%b4%d0%b0-%d0%bb%d0%b8-%d0%b1%d0%be%d0%bb%d1%8c%d1%88%d0%b5-%d0%ba%d0%be%d0%bd%d1%82%d0%b5%d0%ba%d1%81%d1%82%d0%b0-%d0%bb%d1%83%d1%87%d1%88%d0%b5-%d1%82%d0%b5%d0%bc%d0%b0%d1%82%d0%b8%d1%87%d0%b5%d1%81%d0%ba%d0%be%d0%b5-%d0%b8%d1%81%d1%81%d0%bb%d0%b5%d0%b4%d0%be%d0%b2%d0%b0%d0%bd%d0%b8%d0%b5-%d1%81-%d0%be%d1%82%d0%ba%d1%80%d1%8b%d1%82%d1%8b%d0%bc-%d0%b2%d0%be%d0%bf%d1%80%d0%be%d1%81%d0%bd%d0%be-%d0%be%d1%82%d0%b2%d0%b5%d1%82%d0%bd%d1%8b%d0%bc-%d0%b0%d0%bd%d0%b0%d0%bb%d0%b8%d0%b7%d0%be%d0%bc&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;Предоставление языковой модели большего объема информации может помочь, но также увеличивает объем контента для анализа, что может снизить точность.&lt;/li&gt;
+&lt;li&gt;В экспериментах с NaturalQuestions-Open производительность модели насыщается задолго до насыщения извлечения: использование 50 документов вместо 20 улучшает точность лишь на 1–1.5%.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img
+  src=&#34;figures/odqa.jpg&#34;
+  alt=&#34;Извлечение и производительность модели в зависимости от количества документов&#34;
+  
+/&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;связанные-работы&#34;
+    &gt;
+        Связанные работы
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2025/08/lost-in-the-middle/#связанные-работы&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Связанные работы&#34; href=&#34;#%d1%81%d0%b2%d1%8f%d0%b7%d0%b0%d0%bd%d0%bd%d1%8b%d0%b5-%d1%80%d0%b0%d0%b1%d0%be%d1%82%d1%8b&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;языковые-модели-с-длинным-контекстом&#34;
+    &gt;
+        Языковые модели с длинным контекстом
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2025/08/lost-in-the-middle/#языковые-модели-с-длинным-контекстом&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Языковые модели с длинным контекстом&#34; href=&#34;#%d1%8f%d0%b7%d1%8b%d0%ba%d0%be%d0%b2%d1%8b%d0%b5-%d0%bc%d0%be%d0%b4%d0%b5%d0%bb%d0%b8-%d1%81-%d0%b4%d0%bb%d0%b8%d0%bd%d0%bd%d1%8b%d0%bc-%d0%ba%d0%be%d0%bd%d1%82%d0%b5%d0%ba%d1%81%d1%82%d0%be%d0%bc&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Много работ посвящено масштабированию трансформеров по длине контекста: модификации внимания (рекуррентность, аппроксимации, свертки, линейные RNN), ускоренные реализации (FlashAttention), отказ от внимания (RWKV, S4, Hyena).&lt;br&gt;
+Оценка часто проводится по перплексии, но точный доступ к знаниям на длинных контекстах — отдельная задача.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;как-языковые-модели-используют-контекст&#34;
+    &gt;
+        Как языковые модели используют контекст?
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2025/08/lost-in-the-middle/#как-языковые-модели-используют-контекст&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Как языковые модели используют контекст?&#34; href=&#34;#%d0%ba%d0%b0%d0%ba-%d1%8f%d0%b7%d1%8b%d0%ba%d0%be%d0%b2%d1%8b%d0%b5-%d0%bc%d0%be%d0%b4%d0%b5%d0%bb%d0%b8-%d0%b8%d1%81%d0%bf%d0%be%d0%bb%d1%8c%d0%b7%d1%83%d1%8e%d1%82-%d0%ba%d0%be%d0%bd%d1%82%d0%b5%d0%ba%d1%81%d1%82&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Ранние работы показали, что LSTM используют долгосрочный контекст все менее эффективно; внимательные LSTM склонны к недавности; трансформеры часто не используют долгосрочный контекст эффективно; длинный контекст помогает только для некоторых токенов.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;эффект-серийной-позиции&#34;
+    &gt;
+        Эффект серийной позиции
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2025/08/lost-in-the-middle/#эффект-серийной-позиции&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Эффект серийной позиции&#34; href=&#34;#%d1%8d%d1%84%d1%84%d0%b5%d0%ba%d1%82-%d1%81%d0%b5%d1%80%d0%b8%d0%b9%d0%bd%d0%be%d0%b9-%d0%bf%d0%be%d0%b7%d0%b8%d1%86%d0%b8%d0%b8&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;U-образная кривая соответствует эффекту серийной позиции в психологии: люди лучше запоминают первые и последние элементы списка.&lt;br&gt;
+В трансформерах, несмотря на техническую возможность извлекать любой токен, наблюдается аналогичный эффект.&lt;/p&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;заключение&#34;
+    &gt;
+        Заключение
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2025/08/lost-in-the-middle/#заключение&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Заключение&#34; href=&#34;#%d0%b7%d0%b0%d0%ba%d0%bb%d1%8e%d1%87%d0%b5%d0%bd%d0%b8%d0%b5&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Мы эмпирически изучаем, как языковые модели используют длинные входные контексты.&lt;br&gt;
+Показываем, что производительность моделей значительно ухудшается при изменении положения релевантной информации — особенно в середине длинных контекстов.&lt;br&gt;
+Проводим исследование роли архитектуры, контекстуализации с учетом запроса и тонкой настройки инструкций.&lt;br&gt;
+В тематическом исследовании ODQA обнаруживаем, что производительность насыщается задолго до насыщения извлечения.&lt;br&gt;
+Наши результаты дают лучшее понимание того, как языковые модели используют контекст, и предлагают новые протоколы оценки для будущих моделей с длинным контекстом.&lt;/p&gt;
+
+            </content>    
+                                <category scheme="https://valmat.ru/tags/LLM" term="LLM" label="LLM" />
+        </entry>
+        <entry>
+            <title>LittleVec — легковесная векторная база данных</title>
+            <link href="https://valmat.ru/posts/2024/06/little-vec/" rel="alternate" type="text/html"  hreflang="en" />
+            <id>https://valmat.ru/posts/2024/06/little-vec/</id>
+            <published>2025-06-24T12:00:00+03:00</published>
+            <updated>2025-06-24T12:00:00+03:00</updated>
+            <content type="html">
+                &lt;p&gt;В последние годы векторные базы данных стали неотъемлемой частью современных ИИ-проектов: поиск по embedding, RAG-пайплайны, быстрый семантический поиск и многое другое. Однако, если вы когда-либо пробовали развернуть подобную БД — будь то FAISS, Milvus, Qdrant или аналогичные решения — вы наверняка сталкивались с тем, что даже для небольших экспериментов и pet-проектов такие системы требуют довольно мощного железа. В итоге приходится либо платить за дорогой сервер, либо мириться с низкой скоростью и неудобствами.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;мотивация-и-цели&#34;
+    &gt;
+        Мотивация и цели
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#мотивация-и-цели&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Мотивация и цели&#34; href=&#34;#%d0%bc%d0%be%d1%82%d0%b8%d0%b2%d0%b0%d1%86%d0%b8%d1%8f-%d0%b8-%d1%86%d0%b5%d0%bb%d0%b8&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Я регулярно разрабатываю прототипы и экспериментирую с RAG-пайплайнами, поэтому мне остро не хватало простой, быстрой и лёгкой векторной БД, которую можно было бы запустить на любом VPS или даже на домашнем мини-компьютере.&lt;br&gt;
+Мои цели были такие:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Минимальные требования к ресурсам.&lt;/strong&gt; Максимум эффективности: чтобы можно было держать миллионы векторов даже на слабых серверах.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Простота запуска и интеграции.&lt;/strong&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Надёжность хранения.&lt;/strong&gt; Не хочется терять данные из-за сбоя — значит, нужна проверенная СУБД в основе.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Гибкость.&lt;/strong&gt; Возможность использовать разные метрики расстояния, хранить дополнительную информацию (payload), работать с несколькими базами одновременно.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Так и родился &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/little-vec&#34;
+&gt;LittleVec&lt;/a&gt; — минималистичная векторная база данных, работающая как плагин для &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/RocksServer&#34;
+&gt;RocksServer&lt;/a&gt; и использующая в качестве хранилища сверхнадёжную &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://rocksdb.org/&#34;
+&gt;RocksDB&lt;/a&gt;.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;почему-это-может-быть-полезно-вам&#34;
+    &gt;
+        Почему это может быть полезно вам?
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#почему-это-может-быть-полезно-вам&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Почему это может быть полезно вам?&#34; href=&#34;#%d0%bf%d0%be%d1%87%d0%b5%d0%bc%d1%83-%d1%8d%d1%82%d0%be-%d0%bc%d0%be%d0%b6%d0%b5%d1%82-%d0%b1%d1%8b%d1%82%d1%8c-%d0%bf%d0%be%d0%bb%d0%b5%d0%b7%d0%bd%d0%be-%d0%b2%d0%b0%d0%bc&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Экономия ресурсов.&lt;/strong&gt; LittleVec потребляет всего 15–50 Мб ОЗУ даже на миллионах записей. Это значит, что вы можете запускать полноценную векторную БД даже на бюджетных VPS или в контейнере на локальной машине.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Быстрая интеграция.&lt;/strong&gt; Минималистичный и понятный API, готовые Docker-образы, поддержка DEB-пакетов — всё, чтобы вы могли быстро начать использовать LittleVec в своём проекте.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Надёжность и скорость.&lt;/strong&gt; Благодаря RocksDB и оптимизациям на уровне хранения, поиск по миллиону векторов занимает ~60 мс на обычном сервере.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;как-использовать-littlevec&#34;
+    &gt;
+        Как использовать LittleVec
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#как-использовать-littlevec&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Как использовать LittleVec&#34; href=&#34;#%d0%ba%d0%b0%d0%ba-%d0%b8%d1%81%d0%bf%d0%be%d0%bb%d1%8c%d0%b7%d0%be%d0%b2%d0%b0%d1%82%d1%8c-littlevec&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;1-установка-и-запуск&#34;
+    &gt;
+        1. Установка и запуск
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#1-установка-и-запуск&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor 1. Установка и запуск&#34; href=&#34;#1-%d1%83%d1%81%d1%82%d0%b0%d0%bd%d0%be%d0%b2%d0%ba%d0%b0-%d0%b8-%d0%b7%d0%b0%d0%bf%d1%83%d1%81%d0%ba&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;вариант-1-docker&#34;
+    &gt;
+        Вариант 1: Docker
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#вариант-1-docker&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Вариант 1: Docker&#34; href=&#34;#%d0%b2%d0%b0%d1%80%d0%b8%d0%b0%d0%bd%d1%82-1-docker&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Самый простой способ — воспользоваться Docker-образом:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker pull valmatdocker/littlevec
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker run -d -p 5577:5577 --name littlevec valmatdocker/littlevec
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;После запуска API будет доступно на &lt;code&gt;127.0.0.1:5577&lt;/code&gt;.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;вариант-2-установка-через-deb-пакет&#34;
+    &gt;
+        Вариант 2: Установка через DEB-пакет
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#вариант-2-установка-через-deb-пакет&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Вариант 2: Установка через DEB-пакет&#34; href=&#34;#%d0%b2%d0%b0%d1%80%d0%b8%d0%b0%d0%bd%d1%82-2-%d1%83%d1%81%d1%82%d0%b0%d0%bd%d0%be%d0%b2%d0%ba%d0%b0-%d1%87%d0%b5%d1%80%d0%b5%d0%b7-deb-%d0%bf%d0%b0%d0%ba%d0%b5%d1%82&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Если вы предпочитаете запускать сервис напрямую:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Установите &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/RocksServer/releases&#34;
+&gt;RocksServer&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Клонируйте репозиторий LittleVec и соберите DEB-пакет:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git clone https://github.com/valmat/little-vec.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; little-vec/build_deb
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;./build.sh
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo dpkg -i littlevec_&amp;lt;version&amp;gt;_amd64.deb
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;Перезапустите RocksServer:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo /etc/init.d/rocksserver restart
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;вариант-3-сборка-вручную&#34;
+    &gt;
+        Вариант 3: Сборка вручную
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#вариант-3-сборка-вручную&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Вариант 3: Сборка вручную&#34; href=&#34;#%d0%b2%d0%b0%d1%80%d0%b8%d0%b0%d0%bd%d1%82-3-%d1%81%d0%b1%d0%be%d1%80%d0%ba%d0%b0-%d0%b2%d1%80%d1%83%d1%87%d0%bd%d1%83%d1%8e&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; src
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;make -j
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# Поместите little_vec.so в каталог плагинов RocksServer (обычно /usr/lib/rocksserver/plugins)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;2-быстрый-старт-с-api&#34;
+    &gt;
+        2. Быстрый старт с API
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#2-быстрый-старт-с-api&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor 2. Быстрый старт с API&#34; href=&#34;#2-%d0%b1%d1%8b%d1%81%d1%82%d1%80%d1%8b%d0%b9-%d1%81%d1%82%d0%b0%d1%80%d1%82-%d1%81-api&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;создание-базы-данных&#34;
+    &gt;
+        Создание базы данных
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#создание-базы-данных&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Создание базы данных&#34; href=&#34;#%d1%81%d0%be%d0%b7%d0%b4%d0%b0%d0%bd%d0%b8%d0%b5-%d0%b1%d0%b0%d0%b7%d1%8b-%d0%b4%d0%b0%d0%bd%d0%bd%d1%8b%d1%85&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-http&#34; data-lang=&#34;http&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;POST /vecdb/create
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;Content-Type: application/json
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;db_name&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;my_vectors&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;dim&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;128&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;dist&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;cos&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;db_name&lt;/code&gt; — имя вашей БД (любая строка)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;dim&lt;/code&gt; — размерность векторов&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;dist&lt;/code&gt; — метрика: &lt;code&gt;cos&lt;/code&gt;, &lt;code&gt;qcos&lt;/code&gt;, &lt;code&gt;dot_prod&lt;/code&gt;, &lt;code&gt;l1&lt;/code&gt;, &lt;code&gt;l2&lt;/code&gt; (опционально)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;добавление-векторов&#34;
+    &gt;
+        Добавление векторов
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#добавление-векторов&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Добавление векторов&#34; href=&#34;#%d0%b4%d0%be%d0%b1%d0%b0%d0%b2%d0%bb%d0%b5%d0%bd%d0%b8%d0%b5-%d0%b2%d0%b5%d0%ba%d1%82%d0%be%d1%80%d0%be%d0%b2&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-http&#34; data-lang=&#34;http&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;POST /vectors/set
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;Content-Type: application/json
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;db_name&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;my_vectors&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;data&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;nt&#34;&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;vec1&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;nt&#34;&gt;&amp;#34;vector&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mf&#34;&gt;0.1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;0.2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;err&#34;&gt;...&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;],&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;            &lt;span class=&#34;nt&#34;&gt;&amp;#34;payload&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;&amp;#34;text&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;пример&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;поиск-ближайших-векторов&#34;
+    &gt;
+        Поиск ближайших векторов
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#поиск-ближайших-векторов&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Поиск ближайших векторов&#34; href=&#34;#%d0%bf%d0%be%d0%b8%d1%81%d0%ba-%d0%b1%d0%bb%d0%b8%d0%b6%d0%b0%d0%b9%d1%88%d0%b8%d1%85-%d0%b2%d0%b5%d0%ba%d1%82%d0%be%d1%80%d0%be%d0%b2&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-http&#34; data-lang=&#34;http&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;POST /vectors/get/nearest
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;Content-Type: application/json
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;db_name&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;my_vectors&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;vector&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;mf&#34;&gt;0.1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;0.2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;err&#34;&gt;...&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;],&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;top_k&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;5&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Ответ:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;data&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;nt&#34;&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;vec1&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nt&#34;&gt;&amp;#34;distance&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mf&#34;&gt;0.123&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nt&#34;&gt;&amp;#34;payload&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;&amp;#34;text&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;пример&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;},&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;err&#34;&gt;...&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;удаление-векторов&#34;
+    &gt;
+        Удаление векторов
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#удаление-векторов&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Удаление векторов&#34; href=&#34;#%d1%83%d0%b4%d0%b0%d0%bb%d0%b5%d0%bd%d0%b8%d0%b5-%d0%b2%d0%b5%d0%ba%d1%82%d0%be%d1%80%d0%be%d0%b2&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-http&#34; data-lang=&#34;http&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;POST /vectors/delete
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;Content-Type: application/json
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;db_name&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;my_vectors&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nt&#34;&gt;&amp;#34;data&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt; &lt;span class=&#34;nt&#34;&gt;&amp;#34;id&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;vec1&amp;#34;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;3-дополнительные-возможности&#34;
+    &gt;
+        3. Дополнительные возможности
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#3-дополнительные-возможности&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor 3. Дополнительные возможности&#34; href=&#34;#3-%d0%b4%d0%be%d0%bf%d0%be%d0%bb%d0%bd%d0%b8%d1%82%d0%b5%d0%bb%d1%8c%d0%bd%d1%8b%d0%b5-%d0%b2%d0%be%d0%b7%d0%bc%d0%be%d0%b6%d0%bd%d0%be%d1%81%d1%82%d0%b8&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;Можно создавать несколько независимых векторных баз.&lt;/li&gt;
+&lt;li&gt;В каждом запросе указывать свою метрику поиска.&lt;/li&gt;
+&lt;li&gt;Хранить произвольный payload для каждого объекта.&lt;/li&gt;
+&lt;li&gt;Получать distance между любыми векторами и объектами по id.&lt;/li&gt;
+&lt;li&gt;Всё это — по простому HTTP API, легко интегрируется с любым языком.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;заключение&#34;
+    &gt;
+        Заключение
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/06/little-vec/#заключение&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Заключение&#34; href=&#34;#%d0%b7%d0%b0%d0%ba%d0%bb%d1%8e%d1%87%d0%b5%d0%bd%d0%b8%d0%b5&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;LittleVec&lt;/strong&gt; —  минималистичная, быстрая, экономная и надёжная векторная база данных для экспериментов, прототипов или даже небольших production-сервисов.&lt;/p&gt;
+&lt;p&gt;Всё открыто, просто и прозрачно — пробуйте, присылайте фидбек и pull requests!&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/little-vec&#34;
+&gt;GitHub: LittleVec&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/little-vec#readme&#34;
+&gt;Документация и примеры&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;p&gt;Все вопросы в issue на GitHub!&lt;/p&gt;
+
+            </content>    
+                                <category scheme="https://valmat.ru/tags/cpp" term="cpp" label="cpp" /> 
+                                <category scheme="https://valmat.ru/tags/LLM" term="LLM" label="LLM" />
+        </entry>
+        <entry>
+            <title>AI git commit generator</title>
+            <link href="https://valmat.ru/posts/2024/02/git-ai/" rel="alternate" type="text/html"  hreflang="en" />
+            <id>https://valmat.ru/posts/2024/02/git-ai/</id>
+            <published>2024-02-07T12:00:00+03:00</published>
+            <updated>2024-02-07T12:00:00+03:00</updated>
+            <content type="html">
+                &lt;p&gt;В создании коммитов, да и тегов, для гита самое сложное — придумать ёмкое описание, чтобы оно включало все важные аспекты изменений. А ещё это нужно сделать в правильном формате и на грамотном английском.&lt;/p&gt;
+&lt;p&gt;Поэтому в какой-то момент я просто взял и сделал bash-утилиты, использующие AI для этих вещей: &lt;strong&gt;gitai&lt;/strong&gt; для коммитов и &lt;strong&gt;gitaitag&lt;/strong&gt; для тегов. О них и расскажу ниже.&lt;/p&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;ai-для-коммитов-и-тегов-gitai-и-gitaitag&#34;
+    &gt;
+        AI для коммитов и тегов: &lt;code&gt;gitai&lt;/code&gt; и &lt;code&gt;gitaitag&lt;/code&gt;
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#ai-для-коммитов-и-тегов-gitai-и-gitaitag&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor AI для коммитов и тегов: gitai и gitaitag&#34; href=&#34;#ai-%d0%b4%d0%bb%d1%8f-%d0%ba%d0%be%d0%bc%d0%bc%d0%b8%d1%82%d0%be%d0%b2-%d0%b8-%d1%82%d0%b5%d0%b3%d0%be%d0%b2-gitai-%d0%b8-gitaitag&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;что-это-такое&#34;
+    &gt;
+        Что это такое?
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#что-это-такое&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Что это такое?&#34; href=&#34;#%d1%87%d1%82%d0%be-%d1%8d%d1%82%d0%be-%d1%82%d0%b0%d0%ba%d0%be%d0%b5&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://gist.github.com/valmat/44822e1b7c6884bebb25b3ff005117fe&#34;
+&gt;gitai&lt;/a&gt; — это bash-скрипт для Linux и macOS, который помогает создавать информативные git commit-сообщения с помощью OpenAI (или совместимых API). Скрипт не только пишет лаконичные заголовки в прошедшем времени и краткое описание изменений, но и добавляет эмодзи, список затронутых файлов и даже проводит AI-код-ревью с подсветкой потенциальных проблем или улучшений — всё на грамотном английском.&lt;/p&gt;
+&lt;p&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://gist.github.com/valmat/cd64141685f2655c4a02d59902962ca3&#34;
+&gt;gitaitag&lt;/a&gt; — похожий bash-скрипт для генерации содержательных сообщений к git-тегам и автоматического подбора следующей версии. Он анализирует все коммиты с прошлого тега, резюмирует изменения, добавляет релевантные эмодзи и оформляет красивое англоязычное описание релиза.&lt;/p&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;ключевые-возможности&#34;
+    &gt;
+        Ключевые возможности
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#ключевые-возможности&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Ключевые возможности&#34; href=&#34;#%d0%ba%d0%bb%d1%8e%d1%87%d0%b5%d0%b2%d1%8b%d0%b5-%d0%b2%d0%be%d0%b7%d0%bc%d0%be%d0%b6%d0%bd%d0%be%d1%81%d1%82%d0%b8&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;gitai&#34;
+    &gt;
+        &lt;code&gt;gitai&lt;/code&gt;:
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#gitai&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor gitai:&#34; href=&#34;#gitai&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;✨ Генерирует commit-сообщения через OpenAI или совместимый API (можно быстро переключиться на xAI и т.д.)&lt;/li&gt;
+&lt;li&gt;🐞 Проводит AI-код-ревью и вставляет комментарии о возможных багах или улучшениях прямо в коммит&lt;/li&gt;
+&lt;li&gt;📝 Автоматически резюмирует изменения (diff)&lt;/li&gt;
+&lt;li&gt;💬 Украсит сообщение релевантными эмодзи&lt;/li&gt;
+&lt;li&gt;📄 Перечисляет изменённые файлы&lt;/li&gt;
+&lt;li&gt;💡 Принимает подсказку (hint) для дополнительного контекста&lt;/li&gt;
+&lt;li&gt;🏷️ Всегда пишет на английском&lt;/li&gt;
+&lt;li&gt;🔒 Не даст закоммитить, если нет подготовленных изменений&lt;/li&gt;
+&lt;li&gt;🖊️ Даёт возможность отредактировать сообщение перед коммитом&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;gitaitag&#34;
+    &gt;
+        &lt;code&gt;gitaitag&lt;/code&gt;:
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#gitaitag&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor gitaitag:&#34; href=&#34;#gitaitag&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;🚀 Использует любой OpenAI-совместимый API для генерации описания тега&lt;/li&gt;
+&lt;li&gt;🏷️ Автоматически подбирает следующую версию тега (например, “v1.2.3” → “v1.2.4”)&lt;/li&gt;
+&lt;li&gt;✍️ Генерирует подробный changelog по всем коммитам с прошлого тега&lt;/li&gt;
+&lt;li&gt;🤖 Добавляет эмодзи и делает сообщение приятным для чтения&lt;/li&gt;
+&lt;li&gt;💡 Можно добавить свой hint для более точного описания релиза&lt;/li&gt;
+&lt;li&gt;🏷️ Всегда генерирует сообщение на английском&lt;/li&gt;
+&lt;li&gt;✏️ Позволяет вручную подправить текст перед созданием тега&lt;/li&gt;
+&lt;li&gt;🔒 Не создаёт тег, если нет новых коммитов с прошлого релиза&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;требования&#34;
+    &gt;
+        Требования
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#требования&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Требования&#34; href=&#34;#%d1%82%d1%80%d0%b5%d0%b1%d0%be%d0%b2%d0%b0%d0%bd%d0%b8%d1%8f&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Обе утилиты требуют:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;ОС:&lt;/strong&gt; Linux или macOS (Windows не поддерживается)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Зависимости:&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link--code&#34;
+  href=&#34;https://stedolan.github.io/jq/&#34;
+&gt;&lt;code&gt;jq&lt;/code&gt;&lt;/a&gt; (парсинг JSON)&lt;/li&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link--code&#34;
+  href=&#34;https://curl.se/&#34;
+&gt;&lt;code&gt;curl&lt;/code&gt;&lt;/a&gt; (обычно уже установлен)&lt;/li&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link--code&#34;
+  href=&#34;https://www.nano-editor.org/&#34;
+&gt;&lt;code&gt;nano&lt;/code&gt;&lt;/a&gt; (или замените на любимый редактор в скрипте)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;API-ключ OpenAI:&lt;/strong&gt; переменная окружения &lt;code&gt;$OPENAI_API_KEY&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;установка&#34;
+    &gt;
+        Установка
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#установка&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Установка&#34; href=&#34;#%d1%83%d1%81%d1%82%d0%b0%d0%bd%d0%be%d0%b2%d0%ba%d0%b0&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Установите зависимости:&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# Для Debian/Ubuntu и производных&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo apt-get install jq curl nano
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# Для macOS (через Homebrew)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;brew install jq curl nano
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Скачайте скрипты:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;gitai:&lt;/strong&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;curl -o ~/bin/gitai https://gist.github.com/valmat/44822e1b7c6884bebb25b3ff005117fe/raw/gitai.sh
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;chmod +x ~/bin/gitai
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;gitaitag:&lt;/strong&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;curl -o ~/bin/gitaitag https://gist.github.com/valmat/cd64141685f2655c4a02d59902962ca3/raw/gitaitag.sh
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;chmod +x ~/bin/gitaitag
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Добавьте &lt;code&gt;~/bin&lt;/code&gt; в &lt;code&gt;$PATH&lt;/code&gt;:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Добавьте в &lt;code&gt;~/.bashrc&lt;/code&gt;, &lt;code&gt;~/.zshrc&lt;/code&gt; или аналогичный файл:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;export&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;PATH&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;$HOME&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;/bin:&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;$PATH&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Перезапустите терминал или выполните &lt;code&gt;source ~/.bashrc&lt;/code&gt; (или соответствующий файл).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Установите переменную с OpenAI API-ключом:&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;export&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;OPENAI_API_KEY&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;sk-...your key here...&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Для удобства добавьте эту строку в настройки вашей оболочки.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;использование&#34;
+    &gt;
+        Использование
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#использование&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Использование&#34; href=&#34;#%d0%b8%d1%81%d0%bf%d0%be%d0%bb%d1%8c%d0%b7%d0%be%d0%b2%d0%b0%d0%bd%d0%b8%d0%b5&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;для-коммитов--gitai&#34;
+    &gt;
+        Для коммитов — &lt;code&gt;gitai&lt;/code&gt;:
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#для-коммитов--gitai&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Для коммитов — gitai:&#34; href=&#34;#%d0%b4%d0%bb%d1%8f-%d0%ba%d0%be%d0%bc%d0%bc%d0%b8%d1%82%d0%be%d0%b2--gitai&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Перейдите в директорию git-проекта:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; /path/to/your/project
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Запустите скрипт:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;gitai
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Скрипт:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;автоматически выполнит &lt;code&gt;git add&lt;/code&gt; для всех изменений,&lt;/li&gt;
+&lt;li&gt;сгенерирует commit-сообщение с помощью AI,&lt;/li&gt;
+&lt;li&gt;откроет его в редакторе для финального редактирования,&lt;/li&gt;
+&lt;li&gt;закоммитит после сохранения.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;(Опционально) Можно добавить hint для AI:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;gitai &lt;span class=&#34;s2&#34;&gt;&amp;#34;Fix for production crash on startup&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h4 id=&#34;для-тегов--gitaitag&#34;
+    &gt;
+        Для тегов — &lt;code&gt;gitaitag&lt;/code&gt;:
+    &lt;/h4&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#для-тегов--gitaitag&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Для тегов — gitaitag:&#34; href=&#34;#%d0%b4%d0%bb%d1%8f-%d1%82%d0%b5%d0%b3%d0%be%d0%b2--gitaitag&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Перейдите в директорию git-проекта:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; /path/to/your/project
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Запустите скрипт:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;gitaitag
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Скрипт:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;найдет последний тег и предложит следующий (например, “v1.2.3” → “v1.2.4”),&lt;/li&gt;
+&lt;li&gt;проанализирует все коммиты после прошлого тега,&lt;/li&gt;
+&lt;li&gt;сгенерирует AI-описание релиза с эмодзи,&lt;/li&gt;
+&lt;li&gt;откроет его в редакторе для вашего финального взгляда,&lt;/li&gt;
+&lt;li&gt;создаст аннотированный тег с этим сообщением.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;(Опционально) Можно добавить hint для AI:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;gitaitag &lt;span class=&#34;s2&#34;&gt;&amp;#34;Major refactor and new API integration&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;примечания&#34;
+    &gt;
+        Примечания
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#примечания&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Примечания&#34; href=&#34;#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%87%d0%b0%d0%bd%d0%b8%d1%8f&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;Скрипты не поддерживают Windows.&lt;/li&gt;
+&lt;li&gt;Редактор по умолчанию — &lt;code&gt;nano&lt;/code&gt;, можно заменить в скрипте на любой другой.&lt;/li&gt;
+&lt;li&gt;Если нет изменений (для &lt;code&gt;gitai&lt;/code&gt;) или новых коммитов с прошлого тега (для &lt;code&gt;gitaitag&lt;/code&gt;), скрипты не будут ничего делать.&lt;/li&gt;
+&lt;li&gt;Каждый запрос к AI учитывается в биллинге вашего провайдера.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;примеры&#34;
+    &gt;
+        Примеры
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#примеры&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Примеры&#34; href=&#34;#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d1%80%d1%8b&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# Обычный коммит с помощью AI&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;gitai
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# Коммит с подсказкой для AI&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;gitai &lt;span class=&#34;s2&#34;&gt;&amp;#34;Refactored backend integration&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# Обычное создание тега с описанием через AI&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;gitaitag
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# Тег с подсказкой для AI&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;gitaitag &lt;span class=&#34;s2&#34;&gt;&amp;#34;Initial stable version for production&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;hr&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h2 id=&#34;ссылки&#34;
+    &gt;
+        Ссылки
+    &lt;/h2&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2024/02/git-ai/#ссылки&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Ссылки&#34; href=&#34;#%d1%81%d1%81%d1%8b%d0%bb%d0%ba%d0%b8&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://gist.github.com/valmat/44822e1b7c6884bebb25b3ff005117fe&#34;
+&gt;gitai&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://gist.github.com/valmat/cd64141685f2655c4a02d59902962ca3&#34;
+&gt;gitaitag&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+            </content>    
+                                <category scheme="https://valmat.ru/tags/AI" term="AI" label="AI" /> 
+                                <category scheme="https://valmat.ru/tags/LLM" term="LLM" label="LLM" />
+        </entry>
+        <entry>
+            <title>Утилиты для извлечения изображений и текста из PDF</title>
+            <link href="https://valmat.ru/posts/2023/11/pdf-extract/" rel="alternate" type="text/html"  hreflang="en" />
+            <id>https://valmat.ru/posts/2023/11/pdf-extract/</id>
+            <published>2023-11-16T12:00:00+03:00</published>
+            <updated>2023-11-16T12:00:00+03:00</updated>
+            <content type="html">
+                &lt;p&gt;В повседневной работе часто возникает задача быстро извлечь изображения или текст из PDF-документов — будь то подготовка презентаций, анализ документов, создание датасетов или автоматизация обработки большого количества файлов. Стандартные графические редакторы или онлайн-сервисы либо требуют ручной работы, либо работают медленно, либо не позволяют автоматизировать процесс.&lt;/p&gt;
+&lt;p&gt;Чтобы упростить и ускорить решение этих задач, я написал набор утилит на C++ — &lt;strong&gt;PDF2Images&lt;/strong&gt;. Они позволяют:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Мгновенно извлекать все изображения из PDF-файлов в нужном формате (png, jpg, tiff и др.)&lt;/li&gt;
+&lt;li&gt;Получать текст с разбивкой по страницам или в один файл&lt;/li&gt;
+&lt;li&gt;Гибко настраивать параметры извлечения: диапазон страниц, формат выходных файлов, разрешение и пр.&lt;/li&gt;
+&lt;li&gt;Использовать утилиты в автоматических скриптах и пайплайнах&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Я сам ежедневно использую эти инструменты для подготовки скриншотов и текстовых выборок из PDF, а также для построения RAG (Retrieval-Augmented Generation) — когда нужно быстро получить текстовую базу для дальнейшей работы с LLM.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;установка&#34;
+    &gt;
+        Установка
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2023/11/pdf-extract/#установка&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Установка&#34; href=&#34;#%d1%83%d1%81%d1%82%d0%b0%d0%bd%d0%be%d0%b2%d0%ba%d0%b0&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;p&gt;Для работы потребуется установленная библиотека poppler:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;apt install libpoppler-dev
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Далее клонируем репозиторий:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git clone --recursive https://github.com/valmat/pdf2images
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; pdf2images
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;или, если без &lt;code&gt;--recursive&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git clone https://github.com/valmat/pdf2images
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; pdf2images
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git submodule update --init --recursive
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Переходим в папку &lt;code&gt;src&lt;/code&gt; и собираем проект:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; src
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;make release
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Для debug-сборки можно использовать:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;make -j
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;извлечение-изображений&#34;
+    &gt;
+        Извлечение изображений
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2023/11/pdf-extract/#извлечение-изображений&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Извлечение изображений&#34; href=&#34;#%d0%b8%d0%b7%d0%b2%d0%bb%d0%b5%d1%87%d0%b5%d0%bd%d0%b8%d0%b5-%d0%b8%d0%b7%d0%be%d0%b1%d1%80%d0%b0%d0%b6%d0%b5%d0%bd%d0%b8%d0%b9&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;bin/extract_imgs.bin &amp;lt;input_file.pdf&amp;gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;options&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Основные опции:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;-i&lt;/code&gt;, &lt;code&gt;--input&lt;/code&gt; — путь к PDF-файлу&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-o&lt;/code&gt;, &lt;code&gt;--output&lt;/code&gt; — папка для сохранения изображений (по умолчанию &lt;code&gt;.&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-e&lt;/code&gt;, &lt;code&gt;--ext&lt;/code&gt; — формат изображений (по умолчанию &lt;code&gt;png&lt;/code&gt;, можно &lt;code&gt;jpg&lt;/code&gt;, &lt;code&gt;tiff&lt;/code&gt; и др.)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-f&lt;/code&gt;, &lt;code&gt;--from&lt;/code&gt; — первая страница для обработки (по умолчанию 1)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-l&lt;/code&gt;, &lt;code&gt;--lim&lt;/code&gt; — количество страниц для обработки (по умолчанию нет ограничений)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-x&lt;/code&gt;, &lt;code&gt;--xres&lt;/code&gt;, &lt;code&gt;-y&lt;/code&gt;, &lt;code&gt;--yres&lt;/code&gt;, &lt;code&gt;-d&lt;/code&gt;, &lt;code&gt;--dpi&lt;/code&gt; — разрешение и dpi&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-g&lt;/code&gt;, &lt;code&gt;--gray&lt;/code&gt; — черно-белый режим&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-q&lt;/code&gt;, &lt;code&gt;--quiet&lt;/code&gt; — тихий режим (без вывода прогресса)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Пример:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;bin/extract_imgs.bin -i mydoc.pdf -o imgs -e jpg -f &lt;span class=&#34;m&#34;&gt;2&lt;/span&gt; -l &lt;span class=&#34;m&#34;&gt;5&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Извлечет изображения со 2 по 6 страницу в папку &lt;code&gt;imgs&lt;/code&gt; в формате jpg.&lt;/p&gt;
+&lt;div class=&#34;flex align-center gblog-post__anchorwrap&#34;&gt;
+    &lt;h3 id=&#34;извлечение-текста&#34;
+    &gt;
+        Извлечение текста
+    &lt;/h3&gt;
+    &lt;a data-clipboard-text=&#34;https://valmat.ru/posts/2023/11/pdf-extract/#извлечение-текста&#34; class=&#34;gblog-post__anchor clip flex align-center&#34; aria-label=&#34;Anchor Извлечение текста&#34; href=&#34;#%d0%b8%d0%b7%d0%b2%d0%bb%d0%b5%d1%87%d0%b5%d0%bd%d0%b8%d0%b5-%d1%82%d0%b5%d0%ba%d1%81%d1%82%d0%b0&#34;&gt;
+        &lt;svg class=&#34;gblog-icon gblog_link&#34;&gt;&lt;use xlink:href=&#34;#gblog_link&#34;&gt;&lt;/use&gt;&lt;/svg&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;bin/extract_txts.bin -i &amp;lt;input_file.pdf&amp;gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;options&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Основные опции:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;-i&lt;/code&gt;, &lt;code&gt;--input&lt;/code&gt; — входной PDF (обязательно)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-o&lt;/code&gt;, &lt;code&gt;--out-dir&lt;/code&gt; — папка для сохранения текстов (по умолчанию &lt;code&gt;./&lt;/code&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-O&lt;/code&gt;, &lt;code&gt;--out-file&lt;/code&gt; — имя выходного файла (если указано, все страницы будут в одном файле)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-f&lt;/code&gt;, &lt;code&gt;--from&lt;/code&gt; — первая страница для извлечения (по умолчанию 1)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-l&lt;/code&gt;, &lt;code&gt;--limit&lt;/code&gt; — сколько страниц извлекать (по умолчанию без ограничения)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-n&lt;/code&gt;, &lt;code&gt;--nopagebreak&lt;/code&gt; — не добавлять разделитель между страницами (актуально при сохранении в один файл)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Пример:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;bin/extract_txts.bin -i mydoc.pdf -O all_text.txt -f &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt; -l &lt;span class=&#34;m&#34;&gt;10&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Извлечет текст с 1 по 10 страницу в файл &lt;code&gt;all_text.txt&lt;/code&gt;.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;Утилиты распространяются под лицензией MIT, исходники доступны на &lt;a
+  class=&#34;gblog-markdown__link&#34;
+  href=&#34;https://github.com/valmat/pdf2images&#34;
+&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
+
+            </content>    
+                                <category scheme="https://valmat.ru/tags/useful" term="useful" label="useful" /> 
+                                <category scheme="https://valmat.ru/tags/LLM" term="LLM" label="LLM" /> 
+                                <category scheme="https://valmat.ru/tags/cpp" term="cpp" label="cpp" />
+        </entry>
+</feed>
